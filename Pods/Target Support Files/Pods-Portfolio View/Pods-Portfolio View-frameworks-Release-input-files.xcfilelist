@@ -1,0 +1,5 @@
+${PODS_ROOT}/Target Support Files/Pods-Portfolio View/Pods-Portfolio View-frameworks.sh
+${BUILT_PRODUCTS_DIR}/Charts/Charts.framework
+${BUILT_PRODUCTS_DIR}/Realm/Realm.framework
+${BUILT_PRODUCTS_DIR}/RealmSwift/RealmSwift.framework
+${BUILT_PRODUCTS_DIR}/StaticDataTableViewController/StaticDataTableViewController.framework

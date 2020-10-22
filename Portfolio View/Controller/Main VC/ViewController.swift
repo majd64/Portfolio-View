@@ -15,10 +15,8 @@ class ViewController: UIViewController {
     private let myRefreshControl = UIRefreshControl()
     
     private var userRefreshTimer: Timer?
-    private var autoRefreshTimer: Timer?
-    private var canUserRefresh: Bool  = true
-    
-    private var isRefreshing: Bool = false
+    private var autoCoinDataRefreshTimer: Timer?
+    private var autoExchangeRateDataRefreshTimer: Timer?
     
     private let coinHandler = CoinHandler()
 
@@ -29,13 +27,14 @@ class ViewController: UIViewController {
         coinTableView.dataSource = self
         myRefreshControl.addTarget(self, action: #selector (ViewController.userDidRefresh), for: .valueChanged)
         coinTableView.refreshControl = myRefreshControl
-        self.autoRefreshTimer = Timer.scheduledTimer(timeInterval: 30, target: self, selector: #selector(self.requestNewDataFromCoinHandler), userInfo: nil, repeats: true)
+        self.autoCoinDataRefreshTimer = Timer.scheduledTimer(timeInterval: 21, target: self, selector: #selector(self.requestNewCoinData), userInfo: nil, repeats: true)
+        self.autoExchangeRateDataRefreshTimer = Timer.scheduledTimer(timeInterval: 60, target: self, selector: #selector(self.requestNewExchangeRateData), userInfo: nil, repeats: true)
         initPieChart()
-        print(coinHandler.getExchangeRates())
         super.viewDidLoad()
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        coinHandler.fetchCoinData()
         coinTableView.reloadData()
         refreshPieChartData()
     }
@@ -53,13 +52,13 @@ class ViewController: UIViewController {
         let paragraphStyle: NSMutableParagraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = NSTextAlignment.center
         balanceAttributes = [
-            .font: UIFont.systemFont(ofSize: 19),
-            .foregroundColor: UIColor.white,
+            .font: UIFont.systemFont(ofSize: 21),
+            .foregroundColor: UIColor.label,
             .paragraphStyle : paragraphStyle
         ]
         balanceInBTCAttributes = [
-            .font: UIFont.systemFont(ofSize: 13),
-            .foregroundColor: UIColor.white,
+            .font: UIFont.systemFont(ofSize: 15),
+            .foregroundColor: UIColor.label,
             .paragraphStyle : paragraphStyle
         ]
         
@@ -94,7 +93,7 @@ class ViewController: UIViewController {
                 destinationVC.coinHandler = coinHandler
             }
         }
-        else if (segue.identifier == "goToSettings"){
+        else if (segue.identifier == "goToSettingsVC"){
             let destinationVC = segue.destination as! SettingsVC
             destinationVC.coinHandler = coinHandler
         }
@@ -123,7 +122,8 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource{
         
         cell.cellView.layer.cornerRadius = 15
         cell.iconImage.image = UIImage(named: coin.getID())
-        cell.cellView.backgroundColor = UIImage(named: coin.getID())?.averageColor?.withAlphaComponent(1)
+        
+        cell.cellView.backgroundColor = UIImage(named: coin.getID())?.averageColor?.withAlphaComponent(0.5) ?? UIColor.gray.withAlphaComponent(0.50)
         cell.nameLabel.text = coin.getName()
         cell.symbolLabel.text = coin.getSymbol()
         cell.priceLabel.text = coin.getPrice(withRate: rate, symbol: symbol)
@@ -138,50 +138,37 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource{
 //MARK: Refresh Handler
 extension ViewController{
     @objc func userDidRefresh(){
-        if canUserRefresh{
-            canUserRefresh = false
-            self.userRefreshTimer = Timer.scheduledTimer(timeInterval: 10, target: self, selector: #selector(self.userCanRefresh), userInfo: nil, repeats: false)
-            requestNewDataFromCoinHandler()
-        }else{
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                self.myRefreshControl.endRefreshing()
-            }
-        }
-    }
-    
-    @objc func userCanRefresh(){
-        canUserRefresh = true
-    }
-    
-    @objc func requestNewDataFromCoinHandler(){
-        if !isRefreshing{
-            isRefreshing = true
-            self.coinHandler.fetchExchangeRateData()
-        }else{
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             self.myRefreshControl.endRefreshing()
         }
+    }
+    
+    @objc func requestNewCoinData(){
+        coinHandler.fetchCoinData()
+    }
+    
+    @objc func requestNewExchangeRateData(){
+        coinHandler.fetchExchangeRateData()
     }
 }
 
 //MARK: Coin Handler Delegate
 extension ViewController: CoinHandlerDelegate{
     func didUpdateExchangeRatesData() {
-        self.coinHandler.fetchCoinData()
+        DispatchQueue.main.asyncAfter(deadline: .now()) {
+            self.coinTableView.reloadData()
+            self.refreshPieChartData()
+        }
     }
     
     func didUpdateCoinsData() {
         DispatchQueue.main.asyncAfter(deadline: .now()) {
             self.coinTableView.reloadData()
             self.refreshPieChartData()
-            self.myRefreshControl.endRefreshing()
-            self.isRefreshing = false
         }
     }
     
     func didFailWithError(error: Error) {
-        DispatchQueue.main.asyncAfter(deadline: .now()) {
-            self.myRefreshControl.endRefreshing()
-            self.isRefreshing = false
-        }
+        print(error)
     }
 }

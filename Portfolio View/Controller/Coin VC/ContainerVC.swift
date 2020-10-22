@@ -20,11 +20,14 @@ class ContainerVC: UIViewController, CoinHandlerDelegate{
     @IBOutlet weak var balanceLabel: UILabel!
     @IBOutlet weak var balanceValueLabel: UILabel!
     @IBOutlet weak var h24ChangeLabel: UILabel!
+    @IBOutlet weak var segmentedControl: UISegmentedControl!
     
     override func viewDidLoad() {
+        coinHandler.delegate = self
         coinHandler.lineChartDelegate = self
+        segmentedControl.selectedSegmentIndex = 1
         initLineChart()
-        coinHandler.lineChartTimeFrame = CoinHandler.lineChartTimeFrames[0]
+        coinHandler.lineChartTimeFrame = CoinHandler.lineChartTimeFrames[1]
         coinHandler.fetchLineChartData(for: coin.getID(), in: coin.getLineChartQuoteID(), exchange: coin.getLineChartExchange())
         iconImage.image = UIImage(named: coin.getID())
         symbolLabel.text = coin.getSymbol()
@@ -40,7 +43,7 @@ class ContainerVC: UIViewController, CoinHandlerDelegate{
     }
     
     func didUpdateExchangeRatesData() {}
-    
+        
     func didFailWithError(error: Error) {
         print(error)
     }
@@ -62,12 +65,18 @@ extension ContainerVC: canUpdateLineChart{
     
     func didUpdateLineChartDataSet(dataSet: LineChartDataSet) {
         DispatchQueue.main.async { [self] in
-            dataSet.colors = [NSUIColor.init(cgColor: UIImage(named: self.coin.getID())?.averageColor?.cgColor ?? UIColor.black.cgColor)]
+            let col:CGColor
+            if self.traitCollection.userInterfaceStyle == .dark {
+                col = UIImage(named: self.coin.getID())?.averageColor?.lighter()?.cgColor ?? UIColor.gray.cgColor
+            }else{
+                col = UIImage(named: self.coin.getID())?.averageColor?.darker()?.cgColor ?? UIColor.gray.cgColor
+            }
+            dataSet.colors = [NSUIColor.init(cgColor: col)]
             dataSet.drawCirclesEnabled = false
             dataSet.drawValuesEnabled = false
             dataSet.lineWidth = 1.5
-            let gradientColors = [UIImage(named: self.coin.getID())?.averageColor?.cgColor, UIColor.clear.cgColor] as CFArray
-            let colorLocations:[CGFloat] = [1.0, 0.0]
+            let gradientColors = [col, UIColor.clear.cgColor] as CFArray
+            let colorLocations:[CGFloat] = [1.0, 0]
             let gradient:CGGradient? = CGGradient.init(colorsSpace: CGColorSpaceCreateDeviceRGB(), colors: gradientColors, locations: colorLocations)
             if let grade = gradient{
                 dataSet.fill = Fill.fillWithLinearGradient(grade, angle: 90.0)

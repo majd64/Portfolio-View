@@ -8,31 +8,56 @@
 
 import UIKit
 
-class CurrencySettingsVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class CurrencySettingsVC: UITableViewController, UISearchBarDelegate{
     var coinHandler: CoinHandler!
-
-    @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var searchBar: UISearchBar!
+    @IBOutlet var currenciesTableView: UITableView!
+    var currencies: [ExchangeRate] = []
+    
     override func viewDidLoad() {
-        tableView.delegate = self
-        tableView.dataSource = self
+        currencies = coinHandler.getExchangeRates()
+        searchBar.delegate = self
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
     }
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return coinHandler.getExchangeRates().count
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return currencies.count
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell()
         
-        cell.textLabel!.text = "\(coinHandler.getExchangeRates()[indexPath.row].getSymbol()) \(coinHandler.getExchangeRates()[indexPath.row].getCurrencySymbol())"
-        cell.accessoryType = .disclosureIndicator
+        cell.textLabel!.text = "\(currencies[indexPath.row].getSymbol()) (\(currencies[indexPath.row].getId()))"
+        if (currencies[indexPath.row]).getId() == coinHandler.getPreferredExchangeRate()?.getId(){
+            cell.accessoryType = .checkmark
+        }
         return cell
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        coinHandler.setPreferredExchangeRateId(to: currencies[indexPath.row].getId())
+        currenciesTableView.reloadData()
+    }
+    
+    
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        currencies = coinHandler.getExchangeRates().filter({$0.getSymbol().lowercased() .prefix(searchText.count) == searchText.lowercased() || $0.getId().lowercased() .prefix(searchText.count) == searchText.lowercased()})
+   
         
+        currenciesTableView.reloadData()
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.text = ""
+        currencies = coinHandler.getExchangeRates()
+        currenciesTableView.reloadData()
+        searchBar.resignFirstResponder()
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar){
+        searchBar.resignFirstResponder()
     }
 }
 

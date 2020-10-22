@@ -68,7 +68,7 @@ class Coin: Object{
     }
     
     func getPrice(withRate rate: Double) -> Double{
-        return priceUsd * rate
+        return priceUsd / rate
     }
     
     func getPrice(withRate rate: Double, symbol: String) -> String{

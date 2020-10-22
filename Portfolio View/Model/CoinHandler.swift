@@ -16,9 +16,9 @@ class CoinHandler{
     var delegate: CoinHandlerDelegate?
     var lineChartDelegate: canUpdateLineChart?
     private var networkHandler: NetworkHandler = NetworkHandler()
-    public var lineChartTimeFrame: (pointTimeFrame: String, numOfPoints: Int) = lineChartTimeFrames[0]
+    public var lineChartTimeFrame: (pointTimeFrame: String, numOfPoints: Int) = lineChartTimeFrames[1]
     
-    public static let lineChartTimeFrames = [(pointTimeFrame: "m5", numOfPoints: 288), (pointTimeFrame: "m30", numOfPoints: 336), (pointTimeFrame: "h2", numOfPoints: 360), (pointTimeFrame: "h8", numOfPoints: 270), (pointTimeFrame: "h12", numOfPoints: 360), (pointTimeFrame: "d1", numOfPoints: 365), (pointTimeFrame: "w1", numOfPoints: 0)]
+    public static let lineChartTimeFrames = [(pointTimeFrame: "m1", numOfPoints: 240), (pointTimeFrame: "m5", numOfPoints: 288), (pointTimeFrame: "m30", numOfPoints: 336), (pointTimeFrame: "h2", numOfPoints: 360), (pointTimeFrame: "h8", numOfPoints: 270), (pointTimeFrame: "h12", numOfPoints: 360), (pointTimeFrame: "d1", numOfPoints: 365), (pointTimeFrame: "w1", numOfPoints: 0)]
     
     private var coins: Results<Coin>!
     private var coinsArray: [Coin]{
@@ -50,7 +50,8 @@ class CoinHandler{
         return getExchangeRate(id: preferredExchangeRateId)
     }
     
-    let sortTypes: [String: String] = ["balanceValueUsd": "Balance Value", "marketCapUsd": "Market Cap", "changePercent24Hr": "24h Change", "priceUsd": "Price", "name": "Name"]
+    let sortTypeNames: [String] = ["Balance Value", "Market Cap", "24h Change", "Price", "Name"]
+    let sortTypeIds: [String] = ["balanceValueUsd", "marketCapUsd", "changePercent24Hr", "priceUsd", "name"]
     private var preferredSortType: String{
         get{
             if let sortType = defaults.string(forKey: "preferredSortType"){
@@ -59,7 +60,7 @@ class CoinHandler{
             defaults.set("balanceValueUsd", forKey: "preferredSortType")
             return "balanceValueUsd"
         }set{
-            if sortTypes.keys.contains(newValue){
+            if sortTypeIds.contains(newValue){
                 defaults.set(newValue, forKey: "preferredSortType")
                 sortCoins()
             }
@@ -81,6 +82,10 @@ class CoinHandler{
     
     private func sortCoins(){
         coins = coins?.sorted(byKeyPath: "marketCapUsd", ascending: false)
+        if (preferredSortType == "name"){
+            coins = coins?.sorted(byKeyPath: preferredSortType, ascending: true)
+            return
+        }
         coins = coins?.sorted(byKeyPath: preferredSortType, ascending: false)
     }
     
@@ -99,6 +104,10 @@ class CoinHandler{
     
     func setPreferredExchangeRateId(to currencyId: String){
         preferredExchangeRateId = currencyId
+    }
+    
+    func setPreferredSortTypeId(to type: String){
+        preferredSortType = type
     }
     
     private func loadExchangeRates(){
@@ -166,8 +175,8 @@ class CoinHandler{
         return nil
     }
     
-    func setPreferredSortTypeId(to type: String){
-        preferredSortType = type
+    func getPreferredSortTypeId() -> String{
+        return preferredSortType
     }
     
     //MARK: - Pie Chart
@@ -178,7 +187,7 @@ class CoinHandler{
             if coin.getBalanceValue(withRate: preferredExchangeRate?.getRateUsd() ?? 1) != 0{
                 let entry: PieChartDataEntry = PieChartDataEntry(value: coin.getBalanceValue(withRate: preferredExchangeRate?.getRateUsd() ?? 1))
                 pieChartEntries.append(entry)
-                let col: UIColor = (UIImage(named: coin.getID())?.averageColor) ?? UIColor.black
+                let col: UIColor = (UIImage(named: coin.getID())?.averageColor)?.withAlphaComponent(0.75) ?? UIColor.white
                 pieChartEntryColors.append(col)
             }
         }

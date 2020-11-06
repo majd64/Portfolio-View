@@ -26,7 +26,7 @@ class Coin: Object{
     private let transactions = List<Transaction>()
     private var transactionsArray: [Transaction]{
         get{
-            Array(transactions.sorted(byKeyPath: "date", ascending: true))
+            Array(transactions.sorted(byKeyPath: "date", ascending: false))
         }
     }
     

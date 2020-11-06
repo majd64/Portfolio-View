@@ -16,9 +16,9 @@ class CoinHandler{
     var delegate: CoinHandlerDelegate?
     var lineChartDelegate: canUpdateLineChart?
     private var networkHandler: NetworkHandler = NetworkHandler()
-    public var lineChartTimeFrame: (pointTimeFrame: String, numOfPoints: Int) = lineChartTimeFrames[1]
-    
-    public static let lineChartTimeFrames = [(pointTimeFrame: "m1", numOfPoints: 240), (pointTimeFrame: "m5", numOfPoints: 288), (pointTimeFrame: "m30", numOfPoints: 336), (pointTimeFrame: "h2", numOfPoints: 360), (pointTimeFrame: "h8", numOfPoints: 270), (pointTimeFrame: "h12", numOfPoints: 360), (pointTimeFrame: "d1", numOfPoints: 365), (pointTimeFrame: "w1", numOfPoints: 0)]
+//    public var lineChartTimeFrame: (timeFrame: String, pointTimeFrame: String, numOfPoints: Int) = lineChartTimeFrames[1]
+
+    public static let lineChartTimeFrames = [(timeFrame: "4H", pointTimeFrame: "m1", numOfPoints: 240), (timeFrame: "1D", pointTimeFrame: "m5", numOfPoints: 288), (timeFrame: "1W", pointTimeFrame: "m30", numOfPoints: 336), (timeFrame: "1M", pointTimeFrame: "h2", numOfPoints: 360), (timeFrame: "3M", pointTimeFrame: "h8", numOfPoints: 270), (timeFrame: "6M", pointTimeFrame: "h12", numOfPoints: 360), (timeFrame: "1Y", pointTimeFrame: "d1", numOfPoints: 365)]
     
     private var coins: Results<Coin>!
     private var coinsArray: [Coin]{
@@ -93,7 +93,7 @@ class CoinHandler{
         return coinsArray
     }
     
-    private func getCoin(id: String) -> Coin?{
+    func getCoin(id: String) -> Coin?{
         for coin: Coin in coinsArray{
             if coin.getID() == id{
                 return coin
@@ -118,7 +118,7 @@ class CoinHandler{
         return exchangeRateArray
     }
     
-    private func getExchangeRate(id: String) -> ExchangeRate?{
+    func getExchangeRate(id: String) -> ExchangeRate?{
         for rate: ExchangeRate in exchangeRateArray{
             if rate.getId() == id{
                 return rate
@@ -196,7 +196,6 @@ class CoinHandler{
         return chartDataSet
     }
     
-    private var isCandleDataInBTC: Bool = false
     private var fetchingLineChartDataForCoin: Coin? = nil
 }
 
@@ -210,15 +209,23 @@ extension CoinHandler: NetworkHandlerDelegate{
     func fetchExchangeRateData(){
         networkHandler.fetchExchangeRateData()
     }
-
-    func fetchLineChartData(for baseID: String, in quoteID: String, exchange: String){
-        fetchingLineChartDataForCoin = getCoin(id: baseID)
-        if quoteID == "bitcoin"{
-            isCandleDataInBTC = true
-        }else{
-            isCandleDataInBTC = false
+    
+    //.getID(), in: coin.getLineChartQuoteID(), exchange: coin.getLineChartExchange()
+    //for baseID: String, in quoteID: String, exchange: String
+    func fetchLineChartData(for coin: Coin, timeFrame: String){
+        print("fetch line chart data")
+        fetchingLineChartDataForCoin = coin
+        let lineChartTimeFrame: (timeFrame: String, pointTimeFrame: String, numOfPoints: Int) = getLineChartTimeFrameData(timeFrame: timeFrame)!
+        networkHandler.fetchCandleData(exchange: coin.getLineChartExchange(), interval: lineChartTimeFrame.pointTimeFrame, baseID: coin.getID(), quoteID: coin.getLineChartQuoteID(), timeFrame: lineChartTimeFrame.timeFrame)
+    }
+    
+    func getLineChartTimeFrameData(timeFrame: String) -> (timeFrame: String, pointTimeFrame: String, numOfPoints: Int)?{
+        for lineChartTimeFrame in CoinHandler.lineChartTimeFrames{
+            if lineChartTimeFrame.timeFrame == timeFrame{
+                return lineChartTimeFrame
+            }
         }
-        networkHandler.fetchCandleData(exchange: exchange, interval: lineChartTimeFrame.pointTimeFrame, baseID: baseID, quoteID: quoteID)
+        return nil
     }
     
     func didUpdateCoinsData(_ networkHandler: NetworkHandler, coinsData: AllCoinsModel) {
@@ -269,33 +276,34 @@ extension CoinHandler: NetworkHandlerDelegate{
         }
     }
     
-    func didUpdateCandleData(_ networkHandler: NetworkHandler, candlesData: AllCandlesModel) {
+    func didUpdateCandleData(_ networkHandler: NetworkHandler, candlesData: AllCandlesModel, timeFrame: String) {
         DispatchQueue.main.async {
             var lineChartEntry = [ChartDataEntry]()
+            let lineChartTimeFrame: (timeFrame: String, pointTimeFrame: String, numOfPoints: Int) = self.getLineChartTimeFrameData(timeFrame: timeFrame)!
             
             if candlesData.data.count == 0{
                 if let coin: Coin = self.fetchingLineChartDataForCoin{
                     if coin.didAdjustLineChartRequest(){
-                        self.fetchLineChartData(for: coin.getID(), in: coin.getLineChartQuoteID(), exchange: coin.getLineChartExchange())
+                        self.fetchLineChartData(for: coin, timeFrame: timeFrame)
                     }else{
-                        self.lineChartDelegate?.noLineChartData()
+                        self.lineChartDelegate?.noLineChartData(timeFrame: timeFrame)
                     }
                 }
             }
-            else if candlesData.data.count - self.lineChartTimeFrame.numOfPoints < 0{
-                self.lineChartDelegate?.noLineChartData()
+            else if candlesData.data.count - lineChartTimeFrame.numOfPoints < 0{
+                self.lineChartDelegate?.noLineChartData(timeFrame: timeFrame)
             }
             else{
-                for i in candlesData.data.count - self.lineChartTimeFrame.numOfPoints..<candlesData.data.count{
+                for i in candlesData.data.count - lineChartTimeFrame.numOfPoints..<candlesData.data.count{
                     var candleDataOpenPrice: Double = Double(candlesData.data[i].open) ?? 0
-                    if self.isCandleDataInBTC{
+                    if self.fetchingLineChartDataForCoin?.getLineChartQuoteID() == "bitcoin"{
                         candleDataOpenPrice *= self.getCoin(id: "bitcoin")?.getPrice(withRate: 1) ?? 1
                     }
                     let value = ChartDataEntry(x: candlesData.data[i].period, y: candleDataOpenPrice)
                     lineChartEntry.append(value)
                 }
                 let line1 = LineChartDataSet(entries: lineChartEntry, label: "")
-                self.lineChartDelegate?.didUpdateLineChartDataSet(dataSet: line1)
+                self.lineChartDelegate?.didUpdateLineChartDataSet(dataSet: line1, timeFrame: timeFrame)
             }
         }
     }
@@ -312,8 +320,8 @@ protocol CoinHandlerDelegate {
 }
 
 protocol canUpdateLineChart{
-    func didUpdateLineChartDataSet(dataSet: LineChartDataSet)
-    func noLineChartData()
+    func didUpdateLineChartDataSet(dataSet: LineChartDataSet, timeFrame: String)
+    func noLineChartData(timeFrame: String)
     func didFailWithError(error: Error)
 }
 

@@ -14,20 +14,21 @@ struct NetworkHandler{
     
     func fetchCoinData(){
         let url: String = "https://api.coincap.io/v2/assets"
-        performRequest(with: url, requestType: "coinData")
+        performRequest(with: url, requestType: "coinData", otherInfo: nil)
     }
     
     func fetchExchangeRateData(){
         let url: String = "https://api.coincap.io/v2/rates"
-        performRequest(with: url, requestType: "rateData")
+        performRequest(with: url, requestType: "rateData", otherInfo: nil)
     }
     
-    func fetchCandleData(exchange: String, interval: String, baseID: String, quoteID: String){
+    func fetchCandleData(exchange: String, interval: String, baseID: String, quoteID: String, timeFrame: String){
+        print("fetch candle data")
         let url: String = "https://api.coincap.io/v2/candles?exchange=\(exchange)&interval=\(interval)&baseId=\(baseID)&quoteId=\(quoteID)"
-        performRequest(with: url, requestType: "candle")
+        performRequest(with: url, requestType: "candle", otherInfo: timeFrame)
     }
     
-    func performRequest(with urlString: String, requestType: String){
+    func performRequest(with urlString: String, requestType: String, otherInfo: String?){
         if let url = URL(string: urlString){
             let session = URLSession(configuration: .default)
             let task = session.dataTask(with: url) { (data, response, error) in
@@ -47,8 +48,9 @@ struct NetworkHandler{
                         }
                     }
                     else if requestType == "candle"{
+                        print("perform request")
                         if let candleData:AllCandlesModel = self.parseJSON(safeData){
-                            self.delegate?.didUpdateCandleData(self, candlesData: candleData)
+                            self.delegate?.didUpdateCandleData(self, candlesData: candleData, timeFrame: otherInfo ?? "")
                         }
                     }
                 }
@@ -95,5 +97,5 @@ protocol NetworkHandlerDelegate{
     func didUpdateCoinsData(_ networkHandler: NetworkHandler, coinsData: AllCoinsModel)
     func didUpdateExchangesRateData(_ networkHandler: NetworkHandler, exchangeRatesData: AllExchangeRatesModel)
     func didFailWithError(error: Error)
-    func didUpdateCandleData(_ networkHandler: NetworkHandler, candlesData: AllCandlesModel)
+    func didUpdateCandleData(_ networkHandler: NetworkHandler, candlesData: AllCandlesModel, timeFrame: String)
 }

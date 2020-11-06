@@ -11,7 +11,7 @@ import RealmSwift
 
 class Transaction: Object{
     var parentCategory = LinkingObjects(fromType: Coin.self, property: "transactions")
-    @objc dynamic private var date: Date = Date()
+    @objc dynamic private var date: Double = 0
     @objc dynamic private var notes: String = ""
     @objc dynamic private var transactionType: String = ""
     @objc dynamic private var fiatID: String = ""//the id of the pairing coin
@@ -22,12 +22,14 @@ class Transaction: Object{
         self.init()
         self.transactionType = Transaction.typeReceived
         self.amountOfCoin = amountReceived
+        self.date = NSDate().timeIntervalSince1970
     }
     
     convenience init(amountSent: Double){
         self.init()
         self.transactionType = Transaction.typeSent
         self.amountOfCoin = amountSent
+        self.date = NSDate().timeIntervalSince1970
     }
     
     //buy
@@ -37,6 +39,7 @@ class Transaction: Object{
         self.amountOfCoin = amountBought
         self.fiatID = id
         self.amountOfFiat = amountSpent
+        self.date = NSDate().timeIntervalSince1970
     }
     
     //sell
@@ -46,6 +49,7 @@ class Transaction: Object{
         self.amountOfCoin = amountSold
         self.fiatID = id
         self.amountOfFiat = amountReceived
+        self.date = NSDate().timeIntervalSince1970
     }
     
     //transfer
@@ -55,6 +59,7 @@ class Transaction: Object{
         self.amountOfCoin = amountTransferred
         self.fiatID = id
         self.amountOfFiat = amountReceived
+        self.date = NSDate().timeIntervalSince1970
     }
     
     convenience init(amountOfParentCoinReceived amountReceived: Double, transferredFrom id: String, amountOfPairCoinTransferred amountTransferred: Double){
@@ -63,18 +68,11 @@ class Transaction: Object{
         self.amountOfCoin = amountReceived
         self.fiatID = id
         self.amountOfFiat = amountTransferred
-    }
-    
-    func setDate(date: Date){
-        self.date = date
+        self.date = NSDate().timeIntervalSince1970
     }
     
     func setNotes(notes: String){
         self.notes = notes
-    }
-    
-    func getDate() -> Date{
-        return date
     }
     
     func getNotes() -> String{
@@ -83,6 +81,26 @@ class Transaction: Object{
     
     func getTransactionType() -> String{
         return transactionType
+    }
+    
+    func getTransactionTypeName() -> String{
+        switch transactionType{
+        case Transaction.typeSent:
+            return "Sent"
+        case Transaction.typeSold:
+            return "Sold"
+        case Transaction.typeBought:
+            return "Bought"
+        case Transaction.typeReceived:
+            return "Received"
+        case Transaction.typeTransferredFrom:
+            return "Transferred from"
+        case Transaction.typeTransferredTo:
+            return "Transferred To"
+        default:
+            return ""
+        }
+        
     }
     
     func getPairId() -> String{

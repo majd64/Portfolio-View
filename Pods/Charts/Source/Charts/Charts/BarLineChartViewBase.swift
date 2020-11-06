@@ -800,6 +800,9 @@ open class BarLineChartViewBase: ChartViewBase, BarLineScatterCandleBubbleChartD
                 _outerScrollView = nil
             }
         }
+        /// - Custom added for portfolio view
+        delegate?.panGestureEnded?(self)
+        
     }
     
     private func performPanChange(translation: CGPoint) -> Bool

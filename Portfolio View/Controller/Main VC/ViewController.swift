@@ -30,10 +30,12 @@ class ViewController: UIViewController {
         self.autoCoinDataRefreshTimer = Timer.scheduledTimer(timeInterval: 21, target: self, selector: #selector(self.requestNewCoinData), userInfo: nil, repeats: true)
         self.autoExchangeRateDataRefreshTimer = Timer.scheduledTimer(timeInterval: 60, target: self, selector: #selector(self.requestNewExchangeRateData), userInfo: nil, repeats: true)
         initPieChart()
+
         super.viewDidLoad()
     }
-    
+        
     override func viewDidAppear(_ animated: Bool) {
+        coinHandler.delegate = self
         coinHandler.fetchCoinData()
         coinTableView.reloadData()
         refreshPieChartData()
@@ -81,7 +83,7 @@ class ViewController: UIViewController {
         pieChart.holeColor = UIColor.clear
         pieChart.isUserInteractionEnabled = false
         pieChart.legend.enabled = false
-        pieChart.holeRadiusPercent = 0.9
+        pieChart.holeRadiusPercent = 0.94
         refreshPieChartData()
     }
     

@@ -1,12 +1,12 @@
 PODS:
-  - Charts (3.5.0):
-    - Charts/Core (= 3.5.0)
-  - Charts/Core (3.5.0)
-  - Realm (10.0.0):
-    - Realm/Headers (= 10.0.0)
-  - Realm/Headers (10.0.0)
-  - RealmSwift (10.0.0):
-    - Realm (= 10.0.0)
+  - Charts (3.6.0):
+    - Charts/Core (= 3.6.0)
+  - Charts/Core (3.6.0)
+  - Realm (10.1.1):
+    - Realm/Headers (= 10.1.1)
+  - Realm/Headers (10.1.1)
+  - RealmSwift (10.1.1):
+    - Realm (= 10.1.1)
   - StaticDataTableViewController (2.5.0)
 
 DEPENDENCIES:
@@ -22,11 +22,11 @@ SPEC REPOS:
     - StaticDataTableViewController
 
 SPEC CHECKSUMS:
-  Charts: 40a08591df1f8ad5c223ddedfb1a06da92f24f7c
-  Realm: 5654b8e5e45034d07b219e089034be2ef7d1e7bf
-  RealmSwift: 5b4c8c85be4c14ff52054a4d80a8d338167dd79c
+  Charts: b1e3a1f5a1c9ba5394438ca3b91bd8c9076310af
+  Realm: 784ca1da1453e31a9c9adc14445421a81f316119
+  RealmSwift: cc52fe0dcea56387274dff36e19219e055a3bb84
   StaticDataTableViewController: 0c5c4a47861446dd3cfd52530ae801ec7662ce26
 
 PODFILE CHECKSUM: f653345257c90f53e1afc252e06a87f3334f9b74
 
-COCOAPODS: 1.9.3
+COCOAPODS: 1.10.0

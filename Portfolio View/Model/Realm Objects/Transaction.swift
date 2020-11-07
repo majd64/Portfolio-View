@@ -100,7 +100,6 @@ class Transaction: Object{
         default:
             return ""
         }
-        
     }
     
     func getPairId() -> String{
@@ -109,6 +108,10 @@ class Transaction: Object{
     
     func getAmountOfParentCoin() -> Double{
         return amountOfCoin
+    }
+    
+    func getDate() -> Double{
+        return date
     }
     
     func getAmountOfParentCoin() -> String{

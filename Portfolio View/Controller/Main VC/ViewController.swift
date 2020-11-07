@@ -9,7 +9,7 @@
 import UIKit
 import Charts
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, ChartViewDelegate {
     @IBOutlet weak var pieChart: PieChartView!
     @IBOutlet weak var coinTableView: UITableView!
     private let myRefreshControl = UIRefreshControl()
@@ -17,6 +17,10 @@ class ViewController: UIViewController {
     private var userRefreshTimer: Timer?
     private var autoCoinDataRefreshTimer: Timer?
     private var autoExchangeRateDataRefreshTimer: Timer?
+    private let defaults = UserDefaults.standard
+    private var coloredCellsEnabled = false
+    @IBOutlet weak var background: UIImageView!
+    @IBOutlet weak var blur: UIVisualEffectView!
     
     private let coinHandler = CoinHandler()
 
@@ -25,20 +29,34 @@ class ViewController: UIViewController {
         coinHandler.delegate = self
         coinTableView.delegate = self
         coinTableView.dataSource = self
+        pieChart.delegate = self
         myRefreshControl.addTarget(self, action: #selector (ViewController.userDidRefresh), for: .valueChanged)
         coinTableView.refreshControl = myRefreshControl
         self.autoCoinDataRefreshTimer = Timer.scheduledTimer(timeInterval: 21, target: self, selector: #selector(self.requestNewCoinData), userInfo: nil, repeats: true)
         self.autoExchangeRateDataRefreshTimer = Timer.scheduledTimer(timeInterval: 60, target: self, selector: #selector(self.requestNewExchangeRateData), userInfo: nil, repeats: true)
         initPieChart()
-
+        print("load")
+        
         super.viewDidLoad()
     }
         
     override func viewDidAppear(_ animated: Bool) {
+        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        coloredCellsEnabled = defaults.bool(forKey: "coloredCells")
+        if coloredCellsEnabled{
+            background.image = UIImage(named: "bg")
+            blur.isHidden = false
+        }else{
+            background.image = UIImage(named: "Background-3")
+            blur.isHidden = true
+            
+        }
         coinHandler.delegate = self
-        coinHandler.fetchCoinData()
-        coinTableView.reloadData()
         refreshPieChartData()
+        coinTableView.reloadData()
     }
     
     private func refreshPieChartData(){
@@ -79,9 +97,13 @@ class ViewController: UIViewController {
         pieChart.centerAttributedText = balanceLabel
     }
     
+    func chartValueSelected(_ chartView: ChartViewBase, entry: ChartDataEntry, highlight: Highlight) {
+        pieChart.highlightValue(nil)
+        performSegue(withIdentifier: "goToPortfolioDetails", sender: self)
+    }
+    
     private func initPieChart(){
         pieChart.holeColor = UIColor.clear
-        pieChart.isUserInteractionEnabled = false
         pieChart.legend.enabled = false
         pieChart.holeRadiusPercent = 0.94
         refreshPieChartData()
@@ -97,6 +119,11 @@ class ViewController: UIViewController {
         }
         else if (segue.identifier == "goToSettingsVC"){
             let destinationVC = segue.destination as! SettingsVC
+            destinationVC.coinHandler = coinHandler
+        }
+        
+        else if (segue.identifier == "goToPortfolioDetails"){
+            let destinationVC = segue.destination as! PortfolioDetailsVC
             destinationVC.coinHandler = coinHandler
         }
     }
@@ -125,7 +152,14 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource{
         cell.cellView.layer.cornerRadius = 15
         cell.iconImage.image = UIImage(named: coin.getID())
         
-        cell.cellView.backgroundColor = UIImage(named: coin.getID())?.averageColor?.withAlphaComponent(0.5) ?? UIColor.gray.withAlphaComponent(0.50)
+        if coloredCellsEnabled{
+            cell.cellView.backgroundColor = UIImage(named: coin.getID())?.averageColor?.withAlphaComponent(0.5) ?? UIColor.gray.withAlphaComponent(0.50)
+        }else{
+            cell.cellView.backgroundColor = UIColor(named: "Color")
+        }
+        
+        
+        
         cell.nameLabel.text = coin.getName()
         cell.symbolLabel.text = coin.getSymbol()
         cell.priceLabel.text = coin.getPrice(withRate: rate, symbol: symbol)
@@ -173,4 +207,6 @@ extension ViewController: CoinHandlerDelegate{
     func didFailWithError(error: Error) {
         print(error)
     }
+    
+    
 }

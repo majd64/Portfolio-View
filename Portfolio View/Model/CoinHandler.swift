@@ -16,7 +16,6 @@ class CoinHandler{
     var delegate: CoinHandlerDelegate?
     var lineChartDelegate: canUpdateLineChart?
     private var networkHandler: NetworkHandler = NetworkHandler()
-//    public var lineChartTimeFrame: (timeFrame: String, pointTimeFrame: String, numOfPoints: Int) = lineChartTimeFrames[1]
 
     public static let lineChartTimeFrames = [(timeFrame: "4H", pointTimeFrame: "m1", numOfPoints: 240), (timeFrame: "1D", pointTimeFrame: "m5", numOfPoints: 288), (timeFrame: "1W", pointTimeFrame: "m30", numOfPoints: 336), (timeFrame: "1M", pointTimeFrame: "h2", numOfPoints: 360), (timeFrame: "3M", pointTimeFrame: "h8", numOfPoints: 270), (timeFrame: "6M", pointTimeFrame: "h12", numOfPoints: 360), (timeFrame: "1Y", pointTimeFrame: "d1", numOfPoints: 365)]
     
@@ -80,13 +79,15 @@ class CoinHandler{
         coins = realm.objects(Coin.self).sorted(byKeyPath: preferredSortType, ascending: true)
     }
     
-    private func sortCoins(){
+    func sortCoins(){
         coins = coins?.sorted(byKeyPath: "marketCapUsd", ascending: false)
         if (preferredSortType == "name"){
             coins = coins?.sorted(byKeyPath: preferredSortType, ascending: true)
+            coins = coins?.sorted(byKeyPath: "isPinned", ascending: false)
             return
         }
         coins = coins?.sorted(byKeyPath: preferredSortType, ascending: false)
+        coins = coins?.sorted(byKeyPath: "isPinned", ascending: false)
     }
     
     func getCoins() -> [Coin]{
@@ -179,6 +180,59 @@ class CoinHandler{
         return preferredSortType
     }
     
+    func getPortfolioBalanceChange24h() -> Double?{
+            var balanceValueChange24h: Double = 0
+            
+            for coin: Coin in coinsArray{
+                var previousTransactionBalance: Double = 0
+                var newTransactionBalance: Double = 0
+                
+                
+                for transaction: Transaction in coin.getTransactions(){
+                    
+                    let type: String = transaction.getTransactionType()
+                    if type == Transaction.typeSent || type == Transaction.typeSold || type == Transaction.typeTransferredFrom{
+                        
+                        if (NSDate().timeIntervalSince1970 - transaction.getDate() > 86400){
+                            previousTransactionBalance -= transaction.getAmountOfParentCoin()
+                        }else{
+                            newTransactionBalance -= transaction.getAmountOfParentCoin()
+                        }
+                        
+                    }
+                    else if type == Transaction.typeReceived || type == Transaction.typeBought || type == Transaction.typeTransferredTo{
+                        if (NSDate().timeIntervalSince1970 - transaction.getDate() > 86400){
+                            previousTransactionBalance += transaction.getAmountOfParentCoin()
+                        }else{
+                            newTransactionBalance += transaction.getAmountOfParentCoin()
+                        }
+                    }
+                }
+                balanceValueChange24h += previousTransactionBalance * coin.getPrice(withRate: preferredExchangeRate?.getRateUsd() ?? 1) * (1 - (1/(1 + coin.getChangePercent24Hr()))) + newTransactionBalance * coin.getPrice(withRate: preferredExchangeRate?.getRateUsd() ?? 1)
+                            
+            }
+            return balanceValueChange24h
+        
+        
+    }
+    
+    func getPortfolioPercentages() -> [(coinID: String, percentage: Double)]{
+        var percentages: [(coinID: String, percentage: Double)] = []
+        
+        for coin in coinsArray{
+            if coin.getBalance() != 0{
+                if let totalValue: Double = getTotalBalanceValue(){
+                    if totalValue != 0{
+                        let percentage = (coin.getBalanceValue(withRate: preferredExchangeRate?.getRateUsd() ?? 1) / totalValue) * 100
+                        
+                        percentages.append((coinID: coin.getID(), percentage: Double(String(format: "%.2f", percentage))!))
+                    }
+                }
+            }
+        }
+        return percentages
+    }
+    
     //MARK: - Pie Chart
     func getPieChartDataSet() -> PieChartDataSet{
         var pieChartEntries: [PieChartDataEntry] = [PieChartDataEntry]()
@@ -209,11 +263,8 @@ extension CoinHandler: NetworkHandlerDelegate{
     func fetchExchangeRateData(){
         networkHandler.fetchExchangeRateData()
     }
-    
-    //.getID(), in: coin.getLineChartQuoteID(), exchange: coin.getLineChartExchange()
-    //for baseID: String, in quoteID: String, exchange: String
+
     func fetchLineChartData(for coin: Coin, timeFrame: String){
-        print("fetch line chart data")
         fetchingLineChartDataForCoin = coin
         let lineChartTimeFrame: (timeFrame: String, pointTimeFrame: String, numOfPoints: Int) = getLineChartTimeFrameData(timeFrame: timeFrame)!
         networkHandler.fetchCandleData(exchange: coin.getLineChartExchange(), interval: lineChartTimeFrame.pointTimeFrame, baseID: coin.getID(), quoteID: coin.getLineChartQuoteID(), timeFrame: lineChartTimeFrame.timeFrame)

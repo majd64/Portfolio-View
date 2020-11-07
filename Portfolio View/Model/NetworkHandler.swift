@@ -23,7 +23,6 @@ struct NetworkHandler{
     }
     
     func fetchCandleData(exchange: String, interval: String, baseID: String, quoteID: String, timeFrame: String){
-        print("fetch candle data")
         let url: String = "https://api.coincap.io/v2/candles?exchange=\(exchange)&interval=\(interval)&baseId=\(baseID)&quoteId=\(quoteID)"
         performRequest(with: url, requestType: "candle", otherInfo: timeFrame)
     }
@@ -48,7 +47,6 @@ struct NetworkHandler{
                         }
                     }
                     else if requestType == "candle"{
-                        print("perform request")
                         if let candleData:AllCandlesModel = self.parseJSON(safeData){
                             self.delegate?.didUpdateCandleData(self, candlesData: candleData, timeFrame: otherInfo ?? "")
                         }

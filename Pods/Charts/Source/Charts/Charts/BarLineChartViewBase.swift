@@ -799,9 +799,10 @@ open class BarLineChartViewBase: ChartViewBase, BarLineScatterCandleBubbleChartD
                 _outerScrollView?.nsuiIsScrollEnabled = true
                 _outerScrollView = nil
             }
+            /// - Custom added for portfolio view
+            delegate?.panGestureEnded?(self)
         }
-        /// - Custom added for portfolio view
-        delegate?.panGestureEnded?(self)
+        
         
     }
     

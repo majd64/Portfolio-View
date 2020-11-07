@@ -19,6 +19,7 @@ class Coin: Object{
     @objc dynamic private var balance: Double = 0
     @objc dynamic private var balanceValueUsd: Double = 0
     @objc dynamic private var requestIndex: Int = 0
+    @objc dynamic private var isPinned: Bool = false
     @objc dynamic private var iconImage: NSData = NSData()
     
     public static let lineChartRequests: [(exchange: String, quote: String)] = [(exchange: "binance", quote: "tether"), (exchange: "huobi", quote: "tether"), (exchange: "binance", quote: "bitcoin"), (exchange: "huobi", quote: "bitcoin"), (exchange: "hotbit", quote: "bitcoin")]
@@ -40,6 +41,13 @@ class Coin: Object{
                 print("error saving: \(error)")
             }
             return true
+        }
+        do{
+            try realm!.write{
+                requestIndex = 0
+            }
+        }catch{
+            print("error saving: \(error)")
         }
         return false
     }
@@ -110,6 +118,10 @@ class Coin: Object{
         return transactionsArray
     }
     
+    func getPinned() -> Bool{
+        return isPinned
+    }
+    
     func setPriceUsd(to price: Double){
         do{
             try realm!.write(){
@@ -135,6 +147,16 @@ class Coin: Object{
         do{
             try realm!.write(){
                 marketCapUsd = cap
+            }
+        }catch{
+            print("error saving: \(error)")
+        }
+    }
+    
+    func setPinned(to pinned: Bool){
+        do{
+            try realm!.write(){
+                isPinned = pinned
             }
         }catch{
             print("error saving: \(error)")
@@ -183,7 +205,6 @@ class Coin: Object{
         }
         calculateBalanceValueUsd()
     }
- 
     
     private func calculateBalanceValueUsd(){
         do{

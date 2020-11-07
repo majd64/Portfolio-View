@@ -33,6 +33,9 @@
 		E19DF2AA24B62D7C002EE247 /* SelectPairVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = E19DF2A924B62D7C002EE247 /* SelectPairVC.swift */; };
 		E1A33A8F24A6BEBF0007B3E2 /* CoinCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A33A8D24A6BEBF0007B3E2 /* CoinCell.swift */; };
 		E1A33A9024A6BEBF0007B3E2 /* CoinCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E1A33A8E24A6BEBF0007B3E2 /* CoinCell.xib */; };
+		E1B3EC55255632F60001873C /* PortfolioPercentageCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E1B3EC54255632F60001873C /* PortfolioPercentageCell.xib */; };
+		E1B3EC582556330A0001873C /* PortfolioPercentageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1B3EC572556330A0001873C /* PortfolioPercentageCell.swift */; };
+		E1B3EC5D255634BB0001873C /* PortfolioDetailsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1B3EC5C255634BB0001873C /* PortfolioDetailsVC.swift */; };
 		E1B510ED24BA291D0002E1A3 /* ContainerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1B510EC24BA291D0002E1A3 /* ContainerVC.swift */; };
 		E1CB9BB8254A545100300916 /* CoinBalanceCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E1CB9BB7254A545100300916 /* CoinBalanceCell.xib */; };
 		E1CB9BBE254A57A300300916 /* CoinBalanceCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1CB9BBD254A57A300300916 /* CoinBalanceCell.swift */; };
@@ -41,6 +44,7 @@
 		E1CF34282543D7CC00E72AFB /* ThenCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E1CF34272543D7CC00E72AFB /* ThenCell.xib */; };
 		E1E8403B24A47BA50012B347 /* NetworkHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E8403A24A47BA50012B347 /* NetworkHandler.swift */; };
 		E1EF152624B788310015436B /* AddTransferTransactionVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1EF152524B788310015436B /* AddTransferTransactionVC.swift */; };
+		E1F0F75825565585004E8FE6 /* AppStoreReviewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1F0F75725565585004E8FE6 /* AppStoreReviewManager.swift */; };
 		E1FBD26124A2F98900BD83B4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1FBD26024A2F98900BD83B4 /* AppDelegate.swift */; };
 		E1FBD26324A2F98900BD83B4 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1FBD26224A2F98900BD83B4 /* SceneDelegate.swift */; };
 		E1FBD26524A2F98900BD83B4 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1FBD26424A2F98900BD83B4 /* ViewController.swift */; };
@@ -80,6 +84,9 @@
 		E19DF2A924B62D7C002EE247 /* SelectPairVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectPairVC.swift; sourceTree = "<group>"; };
 		E1A33A8D24A6BEBF0007B3E2 /* CoinCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinCell.swift; sourceTree = "<group>"; };
 		E1A33A8E24A6BEBF0007B3E2 /* CoinCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CoinCell.xib; sourceTree = "<group>"; };
+		E1B3EC54255632F60001873C /* PortfolioPercentageCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PortfolioPercentageCell.xib; sourceTree = "<group>"; };
+		E1B3EC572556330A0001873C /* PortfolioPercentageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioPercentageCell.swift; sourceTree = "<group>"; };
+		E1B3EC5C255634BB0001873C /* PortfolioDetailsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioDetailsVC.swift; sourceTree = "<group>"; };
 		E1B510EC24BA291D0002E1A3 /* ContainerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerVC.swift; sourceTree = "<group>"; };
 		E1CB9BB7254A545100300916 /* CoinBalanceCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = CoinBalanceCell.xib; path = "../New Group/CoinBalanceCell.xib"; sourceTree = "<group>"; };
 		E1CB9BBD254A57A300300916 /* CoinBalanceCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinBalanceCell.swift; sourceTree = "<group>"; };
@@ -88,6 +95,7 @@
 		E1CF34272543D7CC00E72AFB /* ThenCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ThenCell.xib; sourceTree = "<group>"; };
 		E1E8403A24A47BA50012B347 /* NetworkHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkHandler.swift; sourceTree = "<group>"; };
 		E1EF152524B788310015436B /* AddTransferTransactionVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTransferTransactionVC.swift; sourceTree = "<group>"; };
+		E1F0F75725565585004E8FE6 /* AppStoreReviewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStoreReviewManager.swift; sourceTree = "<group>"; };
 		E1FBD25D24A2F98900BD83B4 /* Portfolio View.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Portfolio View.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1FBD26024A2F98900BD83B4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E1FBD26224A2F98900BD83B4 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -178,6 +186,7 @@
 			isa = PBXGroup;
 			children = (
 				E1FBD26424A2F98900BD83B4 /* ViewController.swift */,
+				E1B3EC5C255634BB0001873C /* PortfolioDetailsVC.swift */,
 			);
 			path = "Main VC";
 			sourceTree = "<group>";
@@ -201,6 +210,15 @@
 				E19DF2A924B62D7C002EE247 /* SelectPairVC.swift */,
 			);
 			path = "Add Transaction VC";
+			sourceTree = "<group>";
+		};
+		E1B3EC53255632D00001873C /* Portfolio Percentage Cell */ = {
+			isa = PBXGroup;
+			children = (
+				E1B3EC54255632F60001873C /* PortfolioPercentageCell.xib */,
+				E1B3EC572556330A0001873C /* PortfolioPercentageCell.swift */,
+			);
+			path = "Portfolio Percentage Cell";
 			sourceTree = "<group>";
 		};
 		E1CB9BBC254A578800300916 /* Balance Cell */ = {
@@ -266,6 +284,7 @@
 				E1FBD26E24A2F99000BD83B4 /* Info.plist */,
 				E12454C324BA734500875350 /* Constants.swift */,
 				E163CF4A24BB81DF006CF1F4 /* UIImageExtension.swift */,
+				E1F0F75725565585004E8FE6 /* AppStoreReviewManager.swift */,
 			);
 			path = "Portfolio View";
 			sourceTree = "<group>";
@@ -284,6 +303,7 @@
 		E1FBD27524A2F9B400BD83B4 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				E1B3EC53255632D00001873C /* Portfolio Percentage Cell */,
 				E1CB9BBC254A578800300916 /* Balance Cell */,
 				E1CF342A2543DA7D00E72AFB /* Transaction Cell */,
 				E1CF34292543DA7000E72AFB /* Coin Cell */,
@@ -376,6 +396,7 @@
 				E1CB9BB8254A545100300916 /* CoinBalanceCell.xib in Resources */,
 				E1CF34282543D7CC00E72AFB /* ThenCell.xib in Resources */,
 				E1A33A9024A6BEBF0007B3E2 /* CoinCell.xib in Resources */,
+				E1B3EC55255632F60001873C /* PortfolioPercentageCell.xib in Resources */,
 				E135B17125539DB2007F25AB /* NotesCell.xib in Resources */,
 				E1FBD26824A2F98900BD83B4 /* Main.storyboard in Resources */,
 				E124E3CF253E55070015BB08 /* TransactionCell.xib in Resources */,
@@ -440,15 +461,18 @@
 				E1FBD26124A2F98900BD83B4 /* AppDelegate.swift in Sources */,
 				E1091259253F704500DC49F9 /* SettingsVC.swift in Sources */,
 				E116D2192543A6A300506CF0 /* TransactionDetailVC.swift in Sources */,
+				E1B3EC582556330A0001873C /* PortfolioPercentageCell.swift in Sources */,
 				E139C24224A9337000249314 /* CandleModel.swift in Sources */,
 				E1B510ED24BA291D0002E1A3 /* ContainerVC.swift in Sources */,
 				E1995AF524A3DFA00009CDA7 /* CoinHandler.swift in Sources */,
 				E14A447E24B643BD0087B04D /* AddSellTransactionVC.swift in Sources */,
 				E124E3CD253E54BA0015BB08 /* TransactionCell.swift in Sources */,
 				E15DA3FA24B5677200F7D073 /* AddBuyTransactionVC.swift in Sources */,
+				E1B3EC5D255634BB0001873C /* PortfolioDetailsVC.swift in Sources */,
 				E135B17425539E5E007F25AB /* NotesCell.swift in Sources */,
 				E116D2132543A63B00506CF0 /* AmountCell.swift in Sources */,
 				E19DF2AA24B62D7C002EE247 /* SelectPairVC.swift in Sources */,
+				E1F0F75825565585004E8FE6 /* AppStoreReviewManager.swift in Sources */,
 				E1608B2624ABD56A00D36D87 /* CoinVC.swift in Sources */,
 				E1FBD26324A2F98900BD83B4 /* SceneDelegate.swift in Sources */,
 				E14903D724A57AB000A16EA7 /* ExchangeRate.swift in Sources */,

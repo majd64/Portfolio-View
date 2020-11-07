@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17126"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="portfolioPercentageCell" rowHeight="30" id="DBa-uF-Oju" customClass="PortfolioPercentageCell" customModule="Portfolio_View" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="414" height="30"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="DBa-uF-Oju" id="FSv-N3-8qL">
+                <rect key="frame" x="0.0" y="0.0" width="414" height="30"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="bitcoin" translatesAutoresizingMaskIntoConstraints="NO" id="C8n-eZ-MB5">
+                        <rect key="frame" x="20" y="2.5" width="25" height="25"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="25" id="HPh-wJ-lc0"/>
+                            <constraint firstAttribute="height" constant="25" id="mp8-2K-hm7"/>
+                        </constraints>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="BTC" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5nr-ug-Qdd">
+                        <rect key="frame" x="53" y="6" width="29" height="18"/>
+                        <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="15"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="50%" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8LH-iQ-dvk">
+                        <rect key="frame" x="362" y="6" width="32" height="18"/>
+                        <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="15"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="OnO-Y5-XGw">
+                        <rect key="frame" x="90" y="14.5" width="264" height="1"/>
+                        <color key="backgroundColor" systemColor="opaqueSeparatorColor"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="1" id="h0o-Vf-zR1"/>
+                        </constraints>
+                    </view>
+                </subviews>
+                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                <constraints>
+                    <constraint firstItem="8LH-iQ-dvk" firstAttribute="centerY" secondItem="FSv-N3-8qL" secondAttribute="centerY" id="2WB-2p-aIg"/>
+                    <constraint firstItem="C8n-eZ-MB5" firstAttribute="leading" secondItem="FSv-N3-8qL" secondAttribute="leading" constant="20" id="3ox-bz-jxi"/>
+                    <constraint firstAttribute="trailing" secondItem="8LH-iQ-dvk" secondAttribute="trailing" constant="20" id="GuH-zd-jJO"/>
+                    <constraint firstItem="5nr-ug-Qdd" firstAttribute="centerY" secondItem="FSv-N3-8qL" secondAttribute="centerY" id="T7M-Uh-g4A"/>
+                    <constraint firstItem="5nr-ug-Qdd" firstAttribute="leading" secondItem="C8n-eZ-MB5" secondAttribute="trailing" constant="8" id="TfU-mz-xPL"/>
+                    <constraint firstItem="C8n-eZ-MB5" firstAttribute="centerY" secondItem="FSv-N3-8qL" secondAttribute="centerY" id="WCs-2s-m9M"/>
+                    <constraint firstItem="OnO-Y5-XGw" firstAttribute="centerY" secondItem="FSv-N3-8qL" secondAttribute="centerY" id="ba5-gj-PND"/>
+                    <constraint firstItem="OnO-Y5-XGw" firstAttribute="leading" secondItem="5nr-ug-Qdd" secondAttribute="trailing" constant="8" id="kse-2P-6Wm"/>
+                    <constraint firstItem="8LH-iQ-dvk" firstAttribute="leading" secondItem="OnO-Y5-XGw" secondAttribute="trailing" constant="8" id="ysu-AF-JeD"/>
+                </constraints>
+            </tableViewCellContentView>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <connections>
+                <outlet property="coinIcon" destination="C8n-eZ-MB5" id="GKV-E7-OfT"/>
+                <outlet property="coinTicker" destination="5nr-ug-Qdd" id="kfk-ao-ecd"/>
+                <outlet property="percentage" destination="8LH-iQ-dvk" id="R92-pK-Nv3"/>
+            </connections>
+            <point key="canvasLocation" x="-681.15942028985512" y="-110.49107142857143"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="bitcoin" width="170.5" height="170.5"/>
+        <systemColor name="opaqueSeparatorColor">
+            <color red="0.77647058823529413" green="0.77647058823529413" blue="0.78431372549019607" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
+</document>

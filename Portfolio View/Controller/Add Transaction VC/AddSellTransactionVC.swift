@@ -11,7 +11,7 @@ import UIKit
 class AddSellTransactionVC: UITableViewController, UITextFieldDelegate{
     var coin: Coin!
     var coinHandler: CoinHandler!
-    var selectedFiat: ExchangeRate!
+    var selectedFiat: Currency!
     var transactionType: String = Transaction.typeSold
     var isMissingRequiredField = false
     var isNegativeBalance = false
@@ -34,7 +34,7 @@ class AddSellTransactionVC: UITableViewController, UITextFieldDelegate{
         amountSoldTextField.delegate = self
         amountRecievedTextField.delegate = self
         notesTextField.delegate = self
-        selectedFiat = coinHandler.getPreferredExchangeRate()
+        selectedFiat = coinHandler.getPreferredCurrency()
         
         super.viewDidLoad()
     }
@@ -88,6 +88,7 @@ class AddSellTransactionVC: UITableViewController, UITextFieldDelegate{
                             transaction.setNotes(notes: notes)
                         }
                         coin.addTransaction(transaction)
+                        coinHandler.refresh()
                         _ = navigationController?.popViewController(animated: true)
                         return
                     }
@@ -98,6 +99,7 @@ class AddSellTransactionVC: UITableViewController, UITextFieldDelegate{
                         transaction.setNotes(notes: notes)
                     }
                     coin.addTransaction(transaction)
+                    coinHandler.refresh()
                     _ = navigationController?.popViewController(animated: true)
                     return
                 }

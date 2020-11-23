@@ -18,11 +18,56 @@ class Coin: Object{
     @objc dynamic private var marketCapUsd: Double = 0
     @objc dynamic private var balance: Double = 0
     @objc dynamic private var balanceValueUsd: Double = 0
-    @objc dynamic private var requestIndex: Int = 0
     @objc dynamic private var isPinned: Bool = false
     @objc dynamic private var iconImage: NSData = NSData()
     
-    public static let lineChartRequests: [(exchange: String, quote: String)] = [(exchange: "binance", quote: "tether"), (exchange: "huobi", quote: "tether"), (exchange: "binance", quote: "bitcoin"), (exchange: "huobi", quote: "bitcoin"), (exchange: "hotbit", quote: "bitcoin")]
+    private let requestIndex = List<Int>()
+    private let pointsRequestIndex = List<Int>()
+
+    
+    public static let lineChartRequests: [(exchange: String, quote: String)] = [
+        (exchange: "binance" , quote: "tether"),
+        (exchange: "huobi"   , quote: "tether"),
+        (exchange: "coinbene", quote: "tether"),
+        (exchange: "bit-z"   , quote: "tether"),
+        (exchange: "binance" , quote: "bitcoin"),
+        (exchange: "huobi"   , quote: "bitcoin"),
+        (exchange: "coinbene", quote: "bitcoin"),
+        (exchange: "bit-z"   , quote: "bitcoin"),
+        (exchange: "hotbit"  , quote: "bitcoin"),
+        (exchange: "kucoin"  , quote: "bitcoin")
+    ]
+    
+    public static let lineChartTimeFrames: [(timeFrame: String, pointsData: [(pointTimeFrame: String, numOfPoints: Int)])] = [
+        (timeFrame: "4H", pointsData: [(pointTimeFrame: "m1" , numOfPoints: 240), (pointTimeFrame: "m5" , numOfPoints: 48)]),
+        (timeFrame: "1D", pointsData: [(pointTimeFrame: "m5" , numOfPoints: 288), (pointTimeFrame: "m15", numOfPoints: 96)]),
+        (timeFrame: "1W", pointsData: [(pointTimeFrame: "m30", numOfPoints: 336), (pointTimeFrame: "h1" , numOfPoints: 168)]),
+        (timeFrame: "1M", pointsData: [(pointTimeFrame: "h2" , numOfPoints: 360), (pointTimeFrame: "h4" , numOfPoints: 180)]),
+        (timeFrame: "3M", pointsData: [(pointTimeFrame: "h8" , numOfPoints: 270), (pointTimeFrame: "h12", numOfPoints: 180)]),
+        (timeFrame: "6M", pointsData: [(pointTimeFrame: "h12", numOfPoints: 360), (pointTimeFrame: "d1" , numOfPoints: 180)]),
+        (timeFrame: "1Y", pointsData: [(pointTimeFrame: "d1" , numOfPoints: 365), (pointTimeFrame: "w1" , numOfPoints: 52)])
+    ]
+    
+    func getTimeFrameIndex(timeFrame: String) -> Int{
+        switch timeFrame{
+        case "4H":
+            return 0
+        case "1D":
+            return 1
+        case "1W":
+            return 2
+        case "1M":
+            return 3
+        case "3M":
+            return 4
+        case "6M":
+            return 5
+        case "1Y":
+            return 6
+        default:
+            return 0
+        }
+    }
     
     private let transactions = List<Transaction>()
     private var transactionsArray: [Transaction]{
@@ -31,25 +76,51 @@ class Coin: Object{
         }
     }
     
-    func didAdjustLineChartRequest() -> Bool{
-        if requestIndex != Coin.lineChartRequests.count - 1{
-            do{
-                try realm!.write{
-                    requestIndex += 1
+    func requestDidFailShouldTryAgain(timeFrame: String, wasEmpty: Bool) -> Bool{
+        let index = getTimeFrameIndex(timeFrame: timeFrame)
+        if wasEmpty{
+            if requestIndex[index] < Coin.lineChartRequests.count - 1{
+                do{
+                    try realm!.write{
+                        requestIndex[index] += 1
+                    }
+                    return true
+                }catch{
+                    print("error saving: \(error)")
+                    return false
                 }
-            }catch{
-                print("error saving: \(error)")
+            }else{
+                do{
+                    try realm!.write{
+                        requestIndex[index] = 0
+                    }
+                }catch{
+                    print("error saving: \(error)")
+                }
+                return false
             }
-            return true
-        }
-        do{
-            try realm!.write{
-                requestIndex = 0
+        }else{
+            if pointsRequestIndex[index] < Coin.lineChartTimeFrames[index].pointsData.count{
+                do{
+                    try realm!.write{
+                        pointsRequestIndex[index] += 1
+                    }
+                    return true
+                }catch{
+                    print("error saving: \(error)")
+                    return false
+                }
+            }else{
+                do{
+                    try realm!.write{
+                        pointsRequestIndex[index] = 0
+                    }
+                }catch{
+                    print("error saving: \(error)")
+                }
+                return false
             }
-        }catch{
-            print("error saving: \(error)")
         }
-        return false
     }
 
     convenience init(id: String, symbol: String, name: String) {
@@ -57,6 +128,10 @@ class Coin: Object{
         self.id = id
         self.symbol = symbol
         self.name = name
+        for _ in 1...7{
+            requestIndex.append(0)
+            pointsRequestIndex.append(0)
+        }
     }
     
     func getID() -> String{
@@ -231,22 +306,30 @@ class Coin: Object{
         return getPrice(withRate: rate) * balance
     }
     
-    func getBalanceValue(withRate rate: Double, symbol: String) -> String{
-        let balanceValue: Double = getBalanceValue(withRate: rate)
-            
-        let numberFormatter = NumberFormatter()
-        numberFormatter.numberStyle = .decimal
-        numberFormatter.minimumFractionDigits = 2
-        numberFormatter.maximumFractionDigits = 2
-        let formattedBalance = "\(symbol)\(numberFormatter.string(from: NSNumber(value: balanceValue)) ?? "0.00")"
-        return formattedBalance
+//    func getBalanceValue(withRate rate: Double, symbol: String) -> String{
+//        let balanceValue: Double = getBalanceValue(withRate: rate)
+//            
+//        let numberFormatter = NumberFormatter()
+//        numberFormatter.numberStyle = .decimal
+//        numberFormatter.minimumFractionDigits = 2
+//        numberFormatter.maximumFractionDigits = 2
+//        let formattedBalance = "\(symbol)\(numberFormatter.string(from: NSNumber(value: balanceValue)) ?? "0.00")"
+//        return formattedBalance
+//    }
+    
+    func getLineChartQuoteID(timeFrame: String) -> String{
+        return Coin.lineChartRequests[requestIndex[getTimeFrameIndex(timeFrame: timeFrame)]].quote
     }
     
-    func getLineChartQuoteID() -> String{
-        return Coin.lineChartRequests[requestIndex].quote
+    func getLineChartExchange(timeFrame: String) -> String{
+        return Coin.lineChartRequests[requestIndex[getTimeFrameIndex(timeFrame: timeFrame)]].exchange
     }
     
-    func getLineChartExchange() -> String{
-        return Coin.lineChartRequests[requestIndex].exchange
+    func getPointTimeFrame(timeFrame: String) -> String{
+        return Coin.lineChartTimeFrames[getTimeFrameIndex(timeFrame: timeFrame)].pointsData[pointsRequestIndex[getTimeFrameIndex(timeFrame: timeFrame)]].pointTimeFrame
+    }
+    
+    func getNumOfPoints(timeFrame: String) -> Int{
+        return Coin.lineChartTimeFrames[getTimeFrameIndex(timeFrame: timeFrame)].pointsData[pointsRequestIndex[getTimeFrameIndex(timeFrame: timeFrame)]].numOfPoints
     }
 }

@@ -9,7 +9,7 @@
 import UIKit
 import Charts
 
-class ViewController: UIViewController, ChartViewDelegate {
+class ViewController: UIViewController, ChartViewDelegate, CanRefresh {
     @IBOutlet weak var pieChart: PieChartView!
     @IBOutlet weak var coinTableView: UITableView!
     private let myRefreshControl = UIRefreshControl()
@@ -25,8 +25,10 @@ class ViewController: UIViewController, ChartViewDelegate {
     private let coinHandler = CoinHandler()
 
     override func viewDidLoad() {
+        refresh()
         coinTableView.register(UINib(nibName: "CoinCell", bundle: nil), forCellReuseIdentifier: "coinCell")
         coinHandler.delegate = self
+        coinHandler.refreshDelegate = self
         coinTableView.delegate = self
         coinTableView.dataSource = self
         pieChart.delegate = self
@@ -35,34 +37,21 @@ class ViewController: UIViewController, ChartViewDelegate {
         self.autoCoinDataRefreshTimer = Timer.scheduledTimer(timeInterval: 21, target: self, selector: #selector(self.requestNewCoinData), userInfo: nil, repeats: true)
         self.autoExchangeRateDataRefreshTimer = Timer.scheduledTimer(timeInterval: 60, target: self, selector: #selector(self.requestNewExchangeRateData), userInfo: nil, repeats: true)
         initPieChart()
-        print("load")
+        
+        
         
         super.viewDidLoad()
     }
-        
-    override func viewDidAppear(_ animated: Bool) {
-        
-    }
     
     override func viewWillAppear(_ animated: Bool) {
-        coloredCellsEnabled = defaults.bool(forKey: "coloredCells")
-        if coloredCellsEnabled{
-            background.image = UIImage(named: "bg")
-            blur.isHidden = false
-        }else{
-            background.image = UIImage(named: "Background-3")
-            blur.isHidden = true
-            
-        }
+        
         coinHandler.delegate = self
-        refreshPieChartData()
-        coinTableView.reloadData()
     }
     
     private func refreshPieChartData(){
         let chartDataSet: PieChartDataSet = coinHandler.getPieChartDataSet()
         chartDataSet.drawValuesEnabled = false
-        chartDataSet.sliceSpace = 1
+        chartDataSet.sliceSpace = 1.7
         let chartData = PieChartData(dataSet: chartDataSet)
         pieChart.data = chartData
         pieChart.centerText = coinHandler.getTotalBalanceValue()
@@ -105,7 +94,7 @@ class ViewController: UIViewController, ChartViewDelegate {
     private func initPieChart(){
         pieChart.holeColor = UIColor.clear
         pieChart.legend.enabled = false
-        pieChart.holeRadiusPercent = 0.94
+        pieChart.holeRadiusPercent = 0.97
         refreshPieChartData()
     }
     
@@ -146,8 +135,8 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource{
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "coinCell") as! CoinCell
         let coin: Coin = coinHandler.getCoins()[indexPath.row]
-        let rate: Double = coinHandler.getPreferredExchangeRate()?.getRateUsd() ?? 1
-        let symbol: String = coinHandler.getPreferredExchangeRate()?.getCurrencySymbol() ?? "$"
+        let rate: Double = coinHandler.getPreferredCurrency()?.getRateUsd() ?? 1
+        let symbol: String = coinHandler.getPreferredCurrency()?.getCurrencySymbol() ?? "$"
         
         cell.cellView.layer.cornerRadius = 15
         cell.iconImage.image = UIImage(named: coin.getID())
@@ -164,7 +153,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource{
         cell.symbolLabel.text = coin.getSymbol()
         cell.priceLabel.text = coin.getPrice(withRate: rate, symbol: symbol)
         cell.balanceLabel.text = coin.getBalance()
-        cell.balanceValueLabel.text = coin.getBalanceValue(withRate: rate, symbol: symbol)
+        cell.balanceValueLabel.text = K.convertToMoneyFormat(coin.getBalanceValue(withRate: rate), symbol: symbol)
         cell.h24ChangeLabel.text = coin.getChangePercent24Hr()
         
         return cell
@@ -184,13 +173,27 @@ extension ViewController{
     }
     
     @objc func requestNewExchangeRateData(){
-        coinHandler.fetchExchangeRateData()
+        coinHandler.fetchCurrencyData()
     }
 }
 
 //MARK: Coin Handler Delegate
 extension ViewController: CoinHandlerDelegate{
-    func didUpdateExchangeRatesData() {
+    func refresh() {
+        DispatchQueue.main.asyncAfter(deadline: .now()) {
+            self.coloredCellsEnabled = self.defaults.bool(forKey: "coloredCells")
+            if self.coloredCellsEnabled{
+                self.blur.isHidden = false
+            }else{
+                self.blur.isHidden = true
+            }
+            
+            self.refreshPieChartData()
+            self.coinTableView.reloadData()
+        }
+    }
+    
+    func didUpdateCurrencyData() {
         DispatchQueue.main.asyncAfter(deadline: .now()) {
             self.coinTableView.reloadData()
             self.refreshPieChartData()
@@ -210,3 +213,4 @@ extension ViewController: CoinHandlerDelegate{
     
     
 }
+

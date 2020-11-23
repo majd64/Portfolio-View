@@ -9,9 +9,9 @@
 import UIKit
 
 class AddBuyTransactionVC: UITableViewController, UITextFieldDelegate{
-    var coin: Coin!
     var coinHandler: CoinHandler!
-    var selectedFiat: ExchangeRate!
+    var coin: Coin!
+    var selectedFiat: Currency!
     var transactionType: String = Transaction.typeBought
     var isMissingRequiredFieldsTextVisible = false
     
@@ -33,7 +33,7 @@ class AddBuyTransactionVC: UITableViewController, UITextFieldDelegate{
         amountBoughtTextField.delegate = self
         amountSpentTextField.delegate = self
         notesTextField.delegate = self
-        selectedFiat = coinHandler.getPreferredExchangeRate()
+        selectedFiat = coinHandler.getPreferredCurrency()
         super.viewDidLoad()
     }
     
@@ -72,15 +72,17 @@ class AddBuyTransactionVC: UITableViewController, UITextFieldDelegate{
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         if indexPath.section == 4{
-            if let amountBought = Double(amountBoughtTextField.text ?? ""){
+            if let amountBought = Double(K.convertCommasToDots(amountBoughtTextField.text ?? "")){
                 if transactionType == Transaction.typeBought{
-                    if let amountSpent = Double(amountSpentTextField.text ?? ""){
+                    if let amountSpent = Double(K.convertCommasToDots(amountSpentTextField.text ?? "")){
                         let transaction = Transaction(amountOfParentCoinBought: amountBought, boughtWith: selectedFiat.getId(), amountOfPairSpent: amountSpent)
                         if let notes = notesTextField.text{
                             transaction.setNotes(notes: notes)
                         }
                         coin.addTransaction(transaction)
+                        coinHandler.refresh()
                         _ = navigationController?.popViewController(animated: true)
+                        
                         return
                     }
                 }
@@ -90,6 +92,7 @@ class AddBuyTransactionVC: UITableViewController, UITextFieldDelegate{
                         transaction.setNotes(notes: notes)
                     }
                     coin.addTransaction(transaction)
+                    coinHandler.refresh()
                     _ = navigationController?.popViewController(animated: true)
                     return
                 }

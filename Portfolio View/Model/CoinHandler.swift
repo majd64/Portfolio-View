@@ -14,11 +14,12 @@ class CoinHandler{
     private let defaults = UserDefaults.standard
     private let realm = try! Realm()
     var delegate: CoinHandlerDelegate?
-    var lineChartDelegate: canUpdateLineChart?
+    var refreshDelegate: CanRefresh?
+    var lineChartDelegate: CanUpdateLineChartData?
     private var networkHandler: NetworkHandler = NetworkHandler()
-
-    public static let lineChartTimeFrames = [(timeFrame: "4H", pointTimeFrame: "m1", numOfPoints: 240), (timeFrame: "1D", pointTimeFrame: "m5", numOfPoints: 288), (timeFrame: "1W", pointTimeFrame: "m30", numOfPoints: 336), (timeFrame: "1M", pointTimeFrame: "h2", numOfPoints: 360), (timeFrame: "3M", pointTimeFrame: "h8", numOfPoints: 270), (timeFrame: "6M", pointTimeFrame: "h12", numOfPoints: 360), (timeFrame: "1Y", pointTimeFrame: "d1", numOfPoints: 365)]
     
+    let excludedCoins = ["wrapped-bitcoin"]
+
     private var coins: Results<Coin>!
     private var coinsArray: [Coin]{
         get{
@@ -26,27 +27,27 @@ class CoinHandler{
         }
     }
     
-    private var exchangeRates: Results<ExchangeRate>!
-    private var exchangeRateArray: [ExchangeRate]{
+    private var Currencies: Results<Currency>!
+    private var CurrenciesArray: [Currency]{
         get{
-            return Array(exchangeRates)
+            return Array(Currencies)
         }
     }
     
-    private static let preferredExchangeRateKey: String = "preferredCurrency"
-    private var preferredExchangeRateId: String{
+    private var preferredCurrencyId: String{
         get{
-            if let rate = defaults.string(forKey: CoinHandler.preferredExchangeRateKey){
+            if let rate = defaults.string(forKey: "preferredCurrency"){
                 return rate
             }
-            defaults.set("united-states-dollar", forKey: CoinHandler.preferredExchangeRateKey)
+            defaults.set("united-states-dollar", forKey: "preferredCurrency")
             return "united-states-dollar"
         }set{
-            defaults.set(newValue, forKey: CoinHandler.preferredExchangeRateKey)
+            defaults.set(newValue, forKey: "preferredCurrency")
+            refreshDelegate?.refresh()
         }
     }
-    private var preferredExchangeRate: ExchangeRate?{
-        return getExchangeRate(id: preferredExchangeRateId)
+    private var preferredCurrency: Currency?{
+        return getCurrency(id: preferredCurrencyId)
     }
     
     let sortTypeNames: [String] = ["Balance Value", "Market Cap", "24h Change", "Price", "Name"]
@@ -70,9 +71,9 @@ class CoinHandler{
         networkHandler.delegate = self
         loadCoins()
         sortCoins()
-        loadExchangeRates()
+        loadCurrencies()
         fetchCoinData()
-        fetchExchangeRateData()
+        fetchCurrencyData()
     }
     
     private func loadCoins(){
@@ -84,10 +85,12 @@ class CoinHandler{
         if (preferredSortType == "name"){
             coins = coins?.sorted(byKeyPath: preferredSortType, ascending: true)
             coins = coins?.sorted(byKeyPath: "isPinned", ascending: false)
+            refreshDelegate?.refresh()
             return
         }
         coins = coins?.sorted(byKeyPath: preferredSortType, ascending: false)
         coins = coins?.sorted(byKeyPath: "isPinned", ascending: false)
+        refreshDelegate?.refresh()
     }
     
     func getCoins() -> [Coin]{
@@ -103,24 +106,24 @@ class CoinHandler{
         return nil
     }
     
-    func setPreferredExchangeRateId(to currencyId: String){
-        preferredExchangeRateId = currencyId
+    func setPreferredCurrencyId(to currencyId: String){
+        preferredCurrencyId = currencyId
     }
     
     func setPreferredSortTypeId(to type: String){
         preferredSortType = type
     }
     
-    private func loadExchangeRates(){
-        exchangeRates = realm.objects(ExchangeRate.self).sorted(byKeyPath: "symbol", ascending: true)
+    private func loadCurrencies(){
+        Currencies = realm.objects(Currency.self).sorted(byKeyPath: "symbol", ascending: true)
     }
 
-    func getExchangeRates() -> [ExchangeRate]{
-        return exchangeRateArray
+    func getCurrencies() -> [Currency]{
+        return CurrenciesArray
     }
     
-    func getExchangeRate(id: String) -> ExchangeRate?{
-        for rate: ExchangeRate in exchangeRateArray{
+    func getCurrency(id: String) -> Currency?{
+        for rate: Currency in CurrenciesArray{
             if rate.getId() == id{
                 return rate
             }
@@ -128,13 +131,13 @@ class CoinHandler{
         return nil
     }
     
-    func getPreferredExchangeRate() -> ExchangeRate?{
-        return preferredExchangeRate
+    func getPreferredCurrency() -> Currency?{
+        return preferredCurrency
     }
     
     func getTotalBalanceValue() -> Double?{
         var totalBalanceValue: Double = 0
-        if let rate = preferredExchangeRate{
+        if let rate = preferredCurrency{
             for coin: Coin in coinsArray{
                 totalBalanceValue += coin.getBalanceValue(withRate: rate.getRateUsd())
             }
@@ -151,7 +154,7 @@ class CoinHandler{
         
         if let balanceValue = (getTotalBalanceValue() as Double?){
             if balanceValue != 0{
-                let formattedBalance = "\(preferredExchangeRate?.getCurrencySymbol() ?? "$")\(numberFormatter.string(from: NSNumber(value: balanceValue)) ?? "0")"
+                let formattedBalance = "\(preferredCurrency?.getCurrencySymbol() ?? "$")\(numberFormatter.string(from: NSNumber(value: balanceValue)) ?? "0")"
                 return formattedBalance
             }
         }
@@ -162,7 +165,7 @@ class CoinHandler{
         if let balanceValue = getTotalBalanceValue() as Double?{
             if balanceValue != 0{
                 if let bitcoin = getCoin(id: "bitcoin"){
-                    return balanceValue  / bitcoin.getPrice(withRate: preferredExchangeRate?.getRateUsd() ?? 1)
+                    return balanceValue  / bitcoin.getPrice(withRate: preferredCurrency?.getRateUsd() ?? 1)
                 }
             }
         }
@@ -181,39 +184,35 @@ class CoinHandler{
     }
     
     func getPortfolioBalanceChange24h() -> Double?{
-            var balanceValueChange24h: Double = 0
-            
-            for coin: Coin in coinsArray{
-                var previousTransactionBalance: Double = 0
-                var newTransactionBalance: Double = 0
-                
-                
-                for transaction: Transaction in coin.getTransactions(){
+        var balanceValueChange24h: Double = 0
+        for coin: Coin in coinsArray{
+            var previousTransactionBalance: Double = 0
+            var newTransactionBalance: Double = 0
+            for transaction: Transaction in coin.getTransactions(){
+                let type: String = transaction.getTransactionType()
+                if type == Transaction.typeSent || type == Transaction.typeSold || type == Transaction.typeTransferredFrom{
                     
-                    let type: String = transaction.getTransactionType()
-                    if type == Transaction.typeSent || type == Transaction.typeSold || type == Transaction.typeTransferredFrom{
-                        
-                        if (NSDate().timeIntervalSince1970 - transaction.getDate() > 86400){
-                            previousTransactionBalance -= transaction.getAmountOfParentCoin()
-                        }else{
-                            newTransactionBalance -= transaction.getAmountOfParentCoin()
-                        }
-                        
-                    }
-                    else if type == Transaction.typeReceived || type == Transaction.typeBought || type == Transaction.typeTransferredTo{
-                        if (NSDate().timeIntervalSince1970 - transaction.getDate() > 86400){
-                            previousTransactionBalance += transaction.getAmountOfParentCoin()
-                        }else{
-                            newTransactionBalance += transaction.getAmountOfParentCoin()
-                        }
+                    if (NSDate().timeIntervalSince1970 - transaction.getDate() > 86400){
+                        previousTransactionBalance -= transaction.getAmountOfParentCoin()
+                    }else{
+                        newTransactionBalance -= transaction.getAmountOfParentCoin()
                     }
                 }
-                balanceValueChange24h += previousTransactionBalance * coin.getPrice(withRate: preferredExchangeRate?.getRateUsd() ?? 1) * (1 - (1/(1 + coin.getChangePercent24Hr()))) + newTransactionBalance * coin.getPrice(withRate: preferredExchangeRate?.getRateUsd() ?? 1)
-                            
+                else if type == Transaction.typeReceived || type == Transaction.typeBought || type == Transaction.typeTransferredTo{
+                    if (NSDate().timeIntervalSince1970 - transaction.getDate() > 86400){
+                        previousTransactionBalance += transaction.getAmountOfParentCoin()
+                    }else{
+                        newTransactionBalance += transaction.getAmountOfParentCoin()
+                    }
+                }
             }
-            return balanceValueChange24h
-        
-        
+            balanceValueChange24h += previousTransactionBalance * coin.getPrice(withRate: preferredCurrency?.getRateUsd() ?? 1) * (1 - (1/(1 + coin.getChangePercent24Hr()))) + newTransactionBalance * coin.getPrice(withRate: preferredCurrency?.getRateUsd() ?? 1)
+        }
+        return balanceValueChange24h
+    }
+    
+    func refresh(){
+        refreshDelegate?.refresh()
     }
     
     func getPortfolioPercentages() -> [(coinID: String, percentage: Double)]{
@@ -223,7 +222,7 @@ class CoinHandler{
             if coin.getBalance() != 0{
                 if let totalValue: Double = getTotalBalanceValue(){
                     if totalValue != 0{
-                        let percentage = (coin.getBalanceValue(withRate: preferredExchangeRate?.getRateUsd() ?? 1) / totalValue) * 100
+                        let percentage = (coin.getBalanceValue(withRate: preferredCurrency?.getRateUsd() ?? 1) / totalValue) * 100
                         
                         percentages.append((coinID: coin.getID(), percentage: Double(String(format: "%.2f", percentage))!))
                     }
@@ -238,10 +237,10 @@ class CoinHandler{
         var pieChartEntries: [PieChartDataEntry] = [PieChartDataEntry]()
         var pieChartEntryColors: [UIColor] = [UIColor]()
         for coin: Coin in coins!.sorted(byKeyPath: "balanceValueUsd", ascending: false) {
-            if coin.getBalanceValue(withRate: preferredExchangeRate?.getRateUsd() ?? 1) != 0{
-                let entry: PieChartDataEntry = PieChartDataEntry(value: coin.getBalanceValue(withRate: preferredExchangeRate?.getRateUsd() ?? 1))
+            if coin.getBalanceValue(withRate: preferredCurrency?.getRateUsd() ?? 1) != 0{
+                let entry: PieChartDataEntry = PieChartDataEntry(value: coin.getBalanceValue(withRate: preferredCurrency?.getRateUsd() ?? 1))
                 pieChartEntries.append(entry)
-                let col: UIColor = (UIImage(named: coin.getID())?.averageColor)?.withAlphaComponent(0.75) ?? UIColor.white
+                let col: UIColor = (UIImage(named: coin.getID())?.averageColor)?.withAlphaComponent(1) ?? UIColor.white
                 pieChartEntryColors.append(col)
             }
         }
@@ -260,44 +259,39 @@ extension CoinHandler: NetworkHandlerDelegate{
         networkHandler.fetchCoinData()
     }
     
-    func fetchExchangeRateData(){
-        networkHandler.fetchExchangeRateData()
+    func fetchCurrencyData(){
+        networkHandler.fetchCurrencyData()
     }
 
     func fetchLineChartData(for coin: Coin, timeFrame: String){
         fetchingLineChartDataForCoin = coin
-        let lineChartTimeFrame: (timeFrame: String, pointTimeFrame: String, numOfPoints: Int) = getLineChartTimeFrameData(timeFrame: timeFrame)!
-        networkHandler.fetchCandleData(exchange: coin.getLineChartExchange(), interval: lineChartTimeFrame.pointTimeFrame, baseID: coin.getID(), quoteID: coin.getLineChartQuoteID(), timeFrame: lineChartTimeFrame.timeFrame)
+        
+        networkHandler.fetchCandleData(exchange: coin.getLineChartExchange(timeFrame: timeFrame), interval: coin.getPointTimeFrame(timeFrame: timeFrame), baseID: coin.getID(), quoteID: coin.getLineChartQuoteID(timeFrame: timeFrame), timeFrame: timeFrame)
     }
     
-    func getLineChartTimeFrameData(timeFrame: String) -> (timeFrame: String, pointTimeFrame: String, numOfPoints: Int)?{
-        for lineChartTimeFrame in CoinHandler.lineChartTimeFrames{
-            if lineChartTimeFrame.timeFrame == timeFrame{
-                return lineChartTimeFrame
-            }
-        }
-        return nil
-    }
+
     
     func didUpdateCoinsData(_ networkHandler: NetworkHandler, coinsData: AllCoinsModel) {
         DispatchQueue.main.async {
             for coinData: CoinModel in coinsData.data{
-                if let priceUsd = Double(coinData.priceUsd ?? "0"), let marketCapUsd = Double(coinData.marketCapUsd ?? "0"), let change24h = Double(coinData.changePercent24Hr ?? "0"){
-                
-                    var coin: Coin? = self.getCoin(id: coinData.id)
-                    if coin == nil{
-                        coin = Coin(id: coinData.id, symbol: coinData.symbol ?? "", name: coinData.name ?? "")
-                        do{
-                            try self.realm.write(){
-                                self.realm.add(coin!)
+                if !self.excludedCoins.contains(coinData.id){
+                    if let priceUsd = Double(coinData.priceUsd ?? "0"), let marketCapUsd = Double(coinData.marketCapUsd ?? "0"), let change24h = Double(coinData.changePercent24Hr ?? "0"){
+                    
+                        var coin: Coin? = self.getCoin(id: coinData.id)
+                        if coin == nil {
+                            coin = Coin(id: coinData.id, symbol: coinData.symbol ?? "", name: coinData.name ?? "")
+                            do{
+                                try self.realm.write(){
+                                    self.realm.add(coin!)
+                                }
+                            }catch{
+                                print("error saving context \(error)")
                             }
-                        }catch{
-                            print("error saving context \(error)")
                         }
+                        coin!.setPriceUsd(to: priceUsd)
+                        coin!.setMarketCapUsd(to: marketCapUsd)
+                        coin!.setChangePercent24Hr(to: change24h)
                     }
-                    coin!.setPriceUsd(to: priceUsd)
-                    coin!.setMarketCapUsd(to: marketCapUsd)
-                    coin!.setChangePercent24Hr(to: change24h)
                 }
             }
             self.sortCoins()
@@ -305,13 +299,13 @@ extension CoinHandler: NetworkHandlerDelegate{
         }
     }
     
-    func didUpdateExchangesRateData(_ networkHandler: NetworkHandler, exchangeRatesData: AllExchangeRatesModel) {
+    func didUpdateCurrencyData(_ networkHandler: NetworkHandler, CurrenciesData: AllCurrenciesModel) {
         DispatchQueue.main.async {
-            for exchangeRateData: ExchangeRateModel in exchangeRatesData.data{
-                if let rateUsd = Double(exchangeRateData.rateUsd ?? "0"){
-                    var rate: ExchangeRate? = self.getExchangeRate(id: exchangeRateData.id)
+            for CurrencyData: CurrencyModel in CurrenciesData.data{
+                if let rateUsd = Double(CurrencyData.rateUsd ?? "0"){
+                    var rate: Currency? = self.getCurrency(id: CurrencyData.id)
                     if rate == nil{
-                        rate = ExchangeRate(id: exchangeRateData.id, symbol: exchangeRateData.symbol ?? "", currencySymbol: exchangeRateData.currencySymbol ?? "")
+                        rate = Currency(id: CurrencyData.id, symbol: CurrencyData.symbol ?? "", currencySymbol: CurrencyData.currencySymbol ?? "")
                         do{
                             try self.realm.write(){
                                 self.realm.add(rate!)
@@ -323,38 +317,43 @@ extension CoinHandler: NetworkHandlerDelegate{
                     rate!.setRateUsd(to: rateUsd)
                 }
             }
-            self.delegate?.didUpdateExchangeRatesData()
+            self.delegate?.didUpdateCurrencyData()
         }
     }
     
-    func didUpdateCandleData(_ networkHandler: NetworkHandler, candlesData: AllCandlesModel, timeFrame: String) {
+    func didUpdateCandleData(_ networkHandler: NetworkHandler, candlesData: AllCandlesModel, timeFrame: String){
         DispatchQueue.main.async {
-            var lineChartEntry = [ChartDataEntry]()
-            let lineChartTimeFrame: (timeFrame: String, pointTimeFrame: String, numOfPoints: Int) = self.getLineChartTimeFrameData(timeFrame: timeFrame)!
-            
-            if candlesData.data.count == 0{
-                if let coin: Coin = self.fetchingLineChartDataForCoin{
-                    if coin.didAdjustLineChartRequest(){
+            if let coin: Coin = self.fetchingLineChartDataForCoin{
+                var lineChartEntry = [ChartDataEntry]()
+                let start = candlesData.data.count - coin.getNumOfPoints(timeFrame: timeFrame)
+                let end = candlesData.data.count
+                if end == 0{
+                    if coin.requestDidFailShouldTryAgain(timeFrame: timeFrame, wasEmpty: true){
                         self.fetchLineChartData(for: coin, timeFrame: timeFrame)
                     }else{
                         self.lineChartDelegate?.noLineChartData(timeFrame: timeFrame)
                     }
                 }
-            }
-            else if candlesData.data.count - lineChartTimeFrame.numOfPoints < 0{
-                self.lineChartDelegate?.noLineChartData(timeFrame: timeFrame)
-            }
-            else{
-                for i in candlesData.data.count - lineChartTimeFrame.numOfPoints..<candlesData.data.count{
-                    var candleDataOpenPrice: Double = Double(candlesData.data[i].open) ?? 0
-                    if self.fetchingLineChartDataForCoin?.getLineChartQuoteID() == "bitcoin"{
-                        candleDataOpenPrice *= self.getCoin(id: "bitcoin")?.getPrice(withRate: 1) ?? 1
+                else if start < 0{
+                    if coin.requestDidFailShouldTryAgain(timeFrame: timeFrame, wasEmpty: true){
+                        self.fetchLineChartData(for: coin, timeFrame: timeFrame)
+                    }else{
+                        self.lineChartDelegate?.noLineChartData(timeFrame: timeFrame)
                     }
-                    let value = ChartDataEntry(x: candlesData.data[i].period, y: candleDataOpenPrice)
-                    lineChartEntry.append(value)
+                }else{
+                    var inBTC = false
+                    if coin.getLineChartQuoteID(timeFrame: timeFrame) == "bitcoin"{
+                        inBTC = true
+                    }
+                    for i in start..<end{
+                        let candleDataOpenPrice: Double = Double(candlesData.data[i].open) ?? 0]
+                        
+                        let value = ChartDataEntry(x: candlesData.data[i].period, y: candleDataOpenPrice)
+                        lineChartEntry.append(value)
+                    }
+                    let line1 = LineChartDataSet(entries: lineChartEntry, label: "")
+                    self.lineChartDelegate?.didUpdateLineChartDataSet(dataSet: line1, timeFrame: timeFrame, inBTC: inBTC)
                 }
-                let line1 = LineChartDataSet(entries: lineChartEntry, label: "")
-                self.lineChartDelegate?.didUpdateLineChartDataSet(dataSet: line1, timeFrame: timeFrame)
             }
         }
     }
@@ -366,12 +365,16 @@ extension CoinHandler: NetworkHandlerDelegate{
 
 protocol CoinHandlerDelegate {
     func didUpdateCoinsData()
-    func didUpdateExchangeRatesData()
+    func didUpdateCurrencyData()
     func didFailWithError(error: Error)
 }
 
-protocol canUpdateLineChart{
-    func didUpdateLineChartDataSet(dataSet: LineChartDataSet, timeFrame: String)
+protocol CanRefresh {
+    func refresh()
+}
+
+protocol CanUpdateLineChartData{
+    func didUpdateLineChartDataSet(dataSet: LineChartDataSet, timeFrame: String, inBTC: Bool)
     func noLineChartData(timeFrame: String)
     func didFailWithError(error: Error)
 }

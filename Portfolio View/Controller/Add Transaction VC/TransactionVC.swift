@@ -9,13 +9,12 @@
 import UIKit
 
 class TransactionVC: UIViewController {
+    var coinHandler: CoinHandler!
+    var coin: Coin!
     
     @IBOutlet weak var addBuyTransactionView: UIView!
     @IBOutlet weak var addSellTransactionView: UIView!
     @IBOutlet weak var addTransferTransactionView: UIView!
-    
-    var coin: Coin!
-    var coinHandler: CoinHandler!
     
     override func viewDidLoad() {
         addBuyTransactionView.alpha = 1
@@ -44,21 +43,19 @@ class TransactionVC: UIViewController {
     
     @IBAction func segmentedControlChanged(_ sender: UISegmentedControl) {
         self.view.endEditing(true)
-        if sender.selectedSegmentIndex == 0{
+        switch sender.selectedSegmentIndex{
+        case 0:
             addBuyTransactionView.alpha = 1
             addSellTransactionView.alpha = 0
             addTransferTransactionView.alpha = 0
-        }
-        else if sender.selectedSegmentIndex == 1{
+        case 1:
             addBuyTransactionView.alpha = 0
             addSellTransactionView.alpha = 1
             addTransferTransactionView.alpha = 0
-        }
-        else{
+        default:
             addBuyTransactionView.alpha = 0
             addSellTransactionView.alpha = 0
             addTransferTransactionView.alpha = 1
         }
     }
-    
 }

@@ -123,6 +123,7 @@ class AddTransferTransactionVC: UITableViewController, UITextFieldDelegate {
                 }
                 
                 otherCoin.addTransaction(recievedTransaction)
+                coinHandler.refresh()
                 _ = navigationController?.popViewController(animated: true)
                 return
             }

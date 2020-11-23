@@ -82,14 +82,16 @@ extension CoinVC: UITableViewDelegate, UITableViewDataSource{
         if (indexPath.row) == 0{
             let cell = tableView.dequeueReusableCell(withIdentifier: "coinBalanceCell") as! CoinBalanceCell
             cell.balanceLabel.text = coin.getBalance()
-            cell.valueLabel.text = coin.getBalanceValue(withRate: coinHandler.getPreferredExchangeRate()?.getRateUsd() ?? 1, symbol: coinHandler.getPreferredExchangeRate()?.getCurrencySymbol() ?? "")
+            
+            cell.valueLabel.text = K.convertToMoneyFormat(coin.getBalanceValue(withRate: coinHandler.getPreferredCurrency()?.getRateUsd() ?? 1), symbol: coinHandler.getPreferredCurrency()?.getCurrencySymbol() ?? "")
+      
             return cell
             
         }
         let cell = tableView.dequeueReusableCell(withIdentifier: "transactionCell") as! TransactionCell
         let transaction: Transaction = coin.getTransactions()[indexPath.row - 1]
-        let rate: Double = coinHandler.getPreferredExchangeRate()?.getRateUsd() ?? 1
-        let symbol: String = coinHandler.getPreferredExchangeRate()?.getCurrencySymbol() ?? "$"
+        let rate: Double = coinHandler.getPreferredCurrency()?.getRateUsd() ?? 1
+        let symbol: String = coinHandler.getPreferredCurrency()?.getCurrencySymbol() ?? "$"
         cell.amountOfCoinLabel.text = "\(transaction.getAmountOfParentCoin() as String) \(coin.getSymbol())"
         let value = coin.getPrice(withRate: rate) * transaction.getAmountOfParentCoin()
         let numberFormatter = NumberFormatter()

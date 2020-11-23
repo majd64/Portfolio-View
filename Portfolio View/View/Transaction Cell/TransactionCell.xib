@@ -17,7 +17,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="QEV-1Z-i6w">
-                        <rect key="frame" x="10" y="10" width="95.5" height="30"/>
+                        <rect key="frame" x="20" y="10" width="95.5" height="30"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="arrow.down.left" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="Qpy-IY-qTE">
                                 <rect key="frame" x="0.0" y="3" width="15.5" height="23.5"/>
@@ -36,7 +36,7 @@
                         </subviews>
                     </stackView>
                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" alignment="bottom" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="gCa-0f-kRd">
-                        <rect key="frame" x="424.5" y="10" width="96.5" height="30"/>
+                        <rect key="frame" x="414.5" y="10" width="96.5" height="30"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="+0.55983BTC" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wB8-SF-2pf">
                                 <rect key="frame" x="0.0" y="0.0" width="96.5" height="12.5"/>
@@ -57,9 +57,9 @@
                     <constraint firstAttribute="bottom" secondItem="QEV-1Z-i6w" secondAttribute="bottom" constant="10" id="9S2-2p-mpE"/>
                     <constraint firstAttribute="bottom" secondItem="gCa-0f-kRd" secondAttribute="bottom" constant="10" id="Nhj-jP-mcP"/>
                     <constraint firstItem="gCa-0f-kRd" firstAttribute="top" secondItem="ce9-Je-g65" secondAttribute="top" constant="10" id="Yxy-x2-gCJ"/>
-                    <constraint firstItem="QEV-1Z-i6w" firstAttribute="leading" secondItem="ce9-Je-g65" secondAttribute="leading" constant="10" id="cmv-uI-Qhf"/>
+                    <constraint firstAttribute="trailing" secondItem="gCa-0f-kRd" secondAttribute="trailing" constant="20" symbolic="YES" id="o95-AH-Al0"/>
+                    <constraint firstItem="QEV-1Z-i6w" firstAttribute="leading" secondItem="ce9-Je-g65" secondAttribute="leading" constant="20" symbolic="YES" id="pQG-Jb-YF3"/>
                     <constraint firstItem="QEV-1Z-i6w" firstAttribute="top" secondItem="ce9-Je-g65" secondAttribute="top" constant="10" id="q49-JP-t7I"/>
-                    <constraint firstAttribute="trailing" secondItem="gCa-0f-kRd" secondAttribute="trailing" constant="10" id="qYN-qc-vD1"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>

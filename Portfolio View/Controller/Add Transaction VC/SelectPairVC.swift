@@ -12,7 +12,7 @@ class SelectPairVC: UIViewController, UITableViewDataSource, UITableViewDelegate
     var coin: Coin!
     var coinHandler: CoinHandler!
     var sender: Any!
-    var currencies: [ExchangeRate] = []
+    var currencies: [Currency] = []
     var coins: [Coin] = []
     var isTransfer = false
         
@@ -33,7 +33,7 @@ class SelectPairVC: UIViewController, UITableViewDataSource, UITableViewDelegate
         if (isTransfer){
             coins = coinHandler.getCoins()
         }else{
-            currencies = coinHandler.getExchangeRates()
+            currencies = coinHandler.getCurrencies()
         }
         
         super.viewDidLoad()
@@ -46,7 +46,7 @@ class SelectPairVC: UIViewController, UITableViewDataSource, UITableViewDelegate
         if (isTransfer){
             coins = coinHandler.getCoins().filter({$0.getSymbol().lowercased() .prefix(searchText.count) == searchText.lowercased() || $0.getName().lowercased() .prefix(searchText.count) == searchText.lowercased()})
         }else{
-            currencies = coinHandler.getExchangeRates().filter({$0.getSymbol().lowercased() .prefix(searchText.count) == searchText.lowercased() || $0.getId().lowercased() .prefix(searchText.count) == searchText.lowercased()})
+            currencies = coinHandler.getCurrencies().filter({$0.getSymbol().lowercased() .prefix(searchText.count) == searchText.lowercased() || $0.getId().lowercased() .prefix(searchText.count) == searchText.lowercased()})
         }
        
         
@@ -58,7 +58,7 @@ class SelectPairVC: UIViewController, UITableViewDataSource, UITableViewDelegate
         if (isTransfer){
             coins = coinHandler.getCoins()
         }else{
-            currencies = coinHandler.getExchangeRates()
+            currencies = coinHandler.getCurrencies()
         }
         tableView.reloadData()
         searchBar.resignFirstResponder()

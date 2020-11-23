@@ -24,15 +24,31 @@ class ContainerVC: UIViewController, CoinHandlerDelegate, ChartViewDelegate{
     @IBOutlet weak var pinnedButton: UIButton!
     
     private var selectedTimeFrameIndex = 1
+    var homeScreen: ViewController!
     
     let generator = UIImpactFeedbackGenerator(style: .light)
                 
     
-    private var lineChartDataSets: [(timeFrame: String, data: LineChartData?, didFail: Bool)] = [(timeFrame: "4H", data: nil, didFail: false), (timeFrame: "1D", data: nil, didFail: false), (timeFrame: "1W", data: nil, didFail: false), (timeFrame: "1M", data: nil, didFail: false), (timeFrame: "3M", data: nil, didFail: false), (timeFrame: "6M", data: nil, didFail: false), (timeFrame: "1Y", data: nil, didFail: false)]
+    private var lineChartDataSets: [(timeFrame: String, data: LineChartData?, didFail: Bool, inBTC: Bool)] = [
+        (timeFrame: "4H", data: nil, didFail: false, inBTC: false),
+        (timeFrame: "1D", data: nil, didFail: false, inBTC: false),
+        (timeFrame: "1W", data: nil, didFail: false, inBTC: false),
+        (timeFrame: "1M", data: nil, didFail: false, inBTC: false),
+        (timeFrame: "3M", data: nil, didFail: false, inBTC: false),
+        (timeFrame: "6M", data: nil, didFail: false, inBTC: false),
+        (timeFrame: "1Y", data: nil, didFail: false, inBTC: false)]
     
     private let symbolConfig = UIImage.SymbolConfiguration(scale: .large)
         
     override func viewDidLoad() {
+        lineChartDataSets = [
+            (timeFrame: "4H", data: nil, didFail: false, inBTC: false),
+            (timeFrame: "1D", data: nil, didFail: false, inBTC: false),
+            (timeFrame: "1W", data: nil, didFail: false, inBTC: false),
+            (timeFrame: "1M", data: nil, didFail: false, inBTC: false),
+            (timeFrame: "3M", data: nil, didFail: false, inBTC: false),
+            (timeFrame: "6M", data: nil, didFail: false, inBTC: false),
+            (timeFrame: "1Y", data: nil, didFail: false, inBTC: false)]
         refresh()
         coinHandler.delegate = self
         coinHandler.lineChartDelegate = self
@@ -41,6 +57,7 @@ class ContainerVC: UIViewController, CoinHandlerDelegate, ChartViewDelegate{
         initLineChart()
         iconImage.image = UIImage(named: coin.getID())
         symbolLabel.text = coin.getSymbol()
+        
         if (coin.getPinned()){
             pinnedButton.setImage(UIImage(systemName: "star.fill", withConfiguration: symbolConfig), for: .normal)
         }else{
@@ -56,23 +73,19 @@ class ContainerVC: UIViewController, CoinHandlerDelegate, ChartViewDelegate{
         super.viewDidLoad()
     }
     
-    override func viewDidDisappear(_ animated: Bool) {
-        lineChartDataSets.removeAll()
-    }
-    
     func didUpdateCoinsData() {
         refresh()
     }
     
-    func didUpdateExchangeRatesData() {}
+    func didUpdateCurrencyData() {}
         
     func didFailWithError(error: Error) {
         print(error)
     }
     
     
-    @objc private func refresh(){
-        priceLabel.text = coin.getPrice(withRate: coinHandler.getPreferredExchangeRate()?.getRateUsd() ?? 1, symbol: coinHandler.getPreferredExchangeRate()?.getCurrencySymbol() ?? "$")
+    @objc internal func refresh(){
+        priceLabel.text = coin.getPrice(withRate: coinHandler.getPreferredCurrency()?.getRateUsd() ?? 1, symbol: coinHandler.getPreferredCurrency()?.getCurrencySymbol() ?? "$")
         h24ChangeLabel.text = coin.getChangePercent24Hr()
     }
     
@@ -89,7 +102,7 @@ class ContainerVC: UIViewController, CoinHandlerDelegate, ChartViewDelegate{
 }
 
 //MARK: Line Chart
-extension ContainerVC: canUpdateLineChart{
+extension ContainerVC: CanUpdateLineChartData{
     @IBAction func lineChartTimeFrameChanged(_ sender: UISegmentedControl) {
         if (lineChartDataSets[sender.selectedSegmentIndex].didFail){
             lineChart.noDataText = "No Data Available"
@@ -99,7 +112,6 @@ extension ContainerVC: canUpdateLineChart{
         selectedTimeFrameIndex = sender.selectedSegmentIndex
         lineChart.data = lineChartDataSets[selectedTimeFrameIndex].data
         self.lineChart.animate(xAxisDuration: 0.6)
-        print("time frame changed")
     }
     
     func chartValueSelected(_ chartView: ChartViewBase, entry: ChartDataEntry, highlight: Highlight) {
@@ -115,16 +127,32 @@ extension ContainerVC: canUpdateLineChart{
             numberFormatter.minimumFractionDigits = 2
             numberFormatter.maximumFractionDigits = 2
         }
-        let formattedPrice = "\("$")\(numberFormatter.string(from: NSNumber(value: entry.y)) ?? "0.00")"
+        if (lineChartDataSets[selectedTimeFrameIndex].inBTC){
+            let formattedPrice = "\(numberFormatter.string(from: NSNumber(value: entry.y)) ?? "0.00") BTC"
+        }else{
+            let formattedPrice = "$\(numberFormatter.string(from: NSNumber(value: entry.y)) ?? "0.00") USD"
+        }
         
+        
+        let format = DateFormatter()
+        var dateFormat: String = "yyyy-MM-dd HH:mm:ss"
+        if (selectedTimeFrameIndex == 0 || selectedTimeFrameIndex == 1 || selectedTimeFrameIndex == 2){
+            dateFormat = "MMM-dd HH:mm"
+        }
+        else if (selectedTimeFrameIndex == 3 || selectedTimeFrameIndex == 4 || selectedTimeFrameIndex == 5 || selectedTimeFrameIndex == 6){
+            dateFormat = "yyyy-MMM-dd"
+        }
+        format.dateFormat = dateFormat
+        h24ChangeLabel.text = format.string(from: NSDate(timeIntervalSince1970: Double(String(entry.x).prefix(10))!) as Date)
 
-        generator.impactOccurred()
+        
         priceLabel.text = formattedPrice
+        generator.impactOccurred()
     }
     
     
     
-    func didUpdateLineChartDataSet(dataSet: LineChartDataSet, timeFrame: String) {
+    func didUpdateLineChartDataSet(dataSet: LineChartDataSet, timeFrame: String, inBTC: Bool) {
         DispatchQueue.main.async { [self] in
             let col:CGColor
             if self.traitCollection.userInterfaceStyle == .dark {
@@ -153,6 +181,9 @@ extension ContainerVC: canUpdateLineChart{
             for i in 0..<lineChartDataSets.count{
                 if lineChartDataSets[i].timeFrame == timeFrame{
                     lineChartDataSets[i].data = data
+                    if inBTC{
+                        lineChartDataSets[selectedTimeFrameIndex].inBTC = true
+                    }
                     if i == selectedTimeFrameIndex{
                         lineChart.data = lineChartDataSets[selectedTimeFrameIndex].data
                         self.lineChart.animate(xAxisDuration: 0.6)
@@ -165,17 +196,20 @@ extension ContainerVC: canUpdateLineChart{
     private func initLineChart(){
         lineChart.fitScreen()
         lineChart.xAxis.enabled = false
+        
         lineChart.drawBordersEnabled = true
         lineChart.borderLineWidth = 0.1
         lineChart.leftAxis.drawGridLinesEnabled = false
         lineChart.rightAxis.enabled = false
+        lineChart.leftAxis.enabled = false
         lineChart.legend.enabled = false
         lineChart.noDataText = "Loading Data"
     }
     
     
     func panGestureEnded(_ chartView: ChartViewBase) {
-        priceLabel.text = coin.getPrice(withRate: coinHandler.getPreferredExchangeRate()?.getRateUsd() ?? 1, symbol: coinHandler.getPreferredExchangeRate()?.getCurrencySymbol() ?? "$")
+        priceLabel.text = coin.getPrice(withRate: coinHandler.getPreferredCurrency()?.getRateUsd() ?? 1, symbol: coinHandler.getPreferredCurrency()?.getCurrencySymbol() ?? "$")
+        h24ChangeLabel.text = coin.getChangePercent24Hr()
         lineChart.highlightValue(nil)
     }
     

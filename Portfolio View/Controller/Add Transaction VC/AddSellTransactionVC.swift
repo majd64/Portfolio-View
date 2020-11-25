@@ -11,7 +11,7 @@ import UIKit
 class AddSellTransactionVC: UITableViewController, UITextFieldDelegate{
     var coin: Coin!
     var coinHandler: CoinHandler!
-    var selectedFiat: Currency!
+    var selectedFiat: String!
     var transactionType: String = Transaction.typeSold
     var isMissingRequiredField = false
     var isNegativeBalance = false
@@ -34,7 +34,7 @@ class AddSellTransactionVC: UITableViewController, UITextFieldDelegate{
         amountSoldTextField.delegate = self
         amountRecievedTextField.delegate = self
         notesTextField.delegate = self
-        selectedFiat = coinHandler.getPreferredCurrency()
+        selectedFiat = coinHandler.preferredCurrency
         
         super.viewDidLoad()
     }
@@ -53,17 +53,17 @@ class AddSellTransactionVC: UITableViewController, UITextFieldDelegate{
     }
     
     private func reloadTableView(){
-        selectedPairLabel.text = selectedFiat.getSymbol()
-        amountRecievedLabel.text = "Amount recieved (\(selectedFiat.getSymbol()))"
+        selectedPairLabel.text = selectedFiat.uppercased()
+        amountRecievedLabel.text = "Amount recieved (\(String(describing: selectedFiat.uppercased()))))"
         if transactionType == Transaction.typeSold{
-            amountSoldLabel.text = "Amount sold (\(coin.getSymbol()))"
+            amountSoldLabel.text = "Amount sold (\(coin.getSymbol().uppercased()))"
             pairCell.isUserInteractionEnabled = true
             pairLabel.isEnabled = true
             amountReceivedCell.isUserInteractionEnabled = true
             amountRecievedLabel.isEnabled = true
         }
         else if transactionType == Transaction.typeSent{
-            amountSoldLabel.text = "Amount sent (\(coin.getSymbol()))"
+            amountSoldLabel.text = "Amount sent (\(coin.getSymbol().uppercased()))"
             pairCell.isUserInteractionEnabled = false
             pairLabel.isEnabled = false
             amountReceivedCell.isUserInteractionEnabled = false
@@ -83,7 +83,7 @@ class AddSellTransactionVC: UITableViewController, UITextFieldDelegate{
                 }
                 if transactionType == Transaction.typeSold{
                     if let amountRecieved = Double(amountRecievedTextField.text ?? ""){
-                        let transaction = Transaction(amountOfParentCoinSold: amountSold, soldFor: selectedFiat.getId(), amountOfPairReceived: amountRecieved)
+                        let transaction = Transaction(amountOfParentCoinSold: amountSold, soldFor: selectedFiat, amountOfPairReceived: amountRecieved)
                         if let notes = notesTextField.text{
                             transaction.setNotes(notes: notes)
                         }

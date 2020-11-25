@@ -11,7 +11,7 @@ import UIKit
 class AddBuyTransactionVC: UITableViewController, UITextFieldDelegate{
     var coinHandler: CoinHandler!
     var coin: Coin!
-    var selectedFiat: Currency!
+    var selectedFiat: String!
     var transactionType: String = Transaction.typeBought
     var isMissingRequiredFieldsTextVisible = false
     
@@ -33,7 +33,7 @@ class AddBuyTransactionVC: UITableViewController, UITextFieldDelegate{
         amountBoughtTextField.delegate = self
         amountSpentTextField.delegate = self
         notesTextField.delegate = self
-        selectedFiat = coinHandler.getPreferredCurrency()
+        selectedFiat = coinHandler.preferredCurrency
         super.viewDidLoad()
     }
     
@@ -51,17 +51,17 @@ class AddBuyTransactionVC: UITableViewController, UITextFieldDelegate{
     }
     
     private func reloadTableView(){
-        selectedPairLabel.text = selectedFiat.getSymbol()
-        amountSpentLabel.text = "Amount spent (\(selectedFiat.getSymbol()))"
+        selectedPairLabel.text = selectedFiat.uppercased()
+        amountSpentLabel.text = "Amount spent (\(String(describing: selectedFiat.uppercased())))"
         if transactionType == Transaction.typeBought{
-            amountBoughtLabel.text = "Amount bought (\(coin.getSymbol()))"
+            amountBoughtLabel.text = "Amount bought (\(coin.getSymbol().uppercased()))"
             pairCell.isUserInteractionEnabled = true
             pairLabel.isEnabled = true
             amountSpentCell.isUserInteractionEnabled = true
             amountSpentLabel.isEnabled = true
         }
         else if transactionType ==  Transaction.typeReceived{
-            amountBoughtLabel.text = "Amount recieved (\(coin.getSymbol()))"
+            amountBoughtLabel.text = "Amount recieved (\(coin.getSymbol().uppercased()))"
             pairCell.isUserInteractionEnabled = false
             pairLabel.isEnabled = false
             amountSpentCell.isUserInteractionEnabled = false
@@ -75,7 +75,7 @@ class AddBuyTransactionVC: UITableViewController, UITextFieldDelegate{
             if let amountBought = Double(K.convertCommasToDots(amountBoughtTextField.text ?? "")){
                 if transactionType == Transaction.typeBought{
                     if let amountSpent = Double(K.convertCommasToDots(amountSpentTextField.text ?? "")){
-                        let transaction = Transaction(amountOfParentCoinBought: amountBought, boughtWith: selectedFiat.getId(), amountOfPairSpent: amountSpent)
+                        let transaction = Transaction(amountOfParentCoinBought: amountBought, boughtWith: selectedFiat, amountOfPairSpent: amountSpent)
                         if let notes = notesTextField.text{
                             transaction.setNotes(notes: notes)
                         }

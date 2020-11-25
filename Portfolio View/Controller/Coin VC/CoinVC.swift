@@ -83,22 +83,16 @@ extension CoinVC: UITableViewDelegate, UITableViewDataSource{
             let cell = tableView.dequeueReusableCell(withIdentifier: "coinBalanceCell") as! CoinBalanceCell
             cell.balanceLabel.text = coin.getBalance()
             
-            cell.valueLabel.text = K.convertToMoneyFormat(coin.getBalanceValue(withRate: coinHandler.getPreferredCurrency()?.getRateUsd() ?? 1), symbol: coinHandler.getPreferredCurrency()?.getCurrencySymbol() ?? "")
+            cell.valueLabel.text = K.convertToMoneyFormat(coin.getBalanceValue(), currency: coinHandler.preferredCurrency)
       
             return cell
             
         }
         let cell = tableView.dequeueReusableCell(withIdentifier: "transactionCell") as! TransactionCell
         let transaction: Transaction = coin.getTransactions()[indexPath.row - 1]
-        let rate: Double = coinHandler.getPreferredCurrency()?.getRateUsd() ?? 1
-        let symbol: String = coinHandler.getPreferredCurrency()?.getCurrencySymbol() ?? "$"
         cell.amountOfCoinLabel.text = "\(transaction.getAmountOfParentCoin() as String) \(coin.getSymbol())"
-        let value = coin.getPrice(withRate: rate) * transaction.getAmountOfParentCoin()
-        let numberFormatter = NumberFormatter()
-        numberFormatter.numberStyle = .decimal
-        numberFormatter.minimumFractionDigits = 2
-        numberFormatter.maximumFractionDigits = 2
-        let formattedAmountOfFiat = "\(symbol)\(numberFormatter.string(from: NSNumber(value: value)) ?? "0.00")"
+        let value = coin.getPrice() * transaction.getAmountOfParentCoin()
+        let formattedAmountOfFiat = K.convertToCoinPrice(value, currency: coinHandler.preferredCurrency)
         cell.amountOfFiatLabel.text = formattedAmountOfFiat
         cell.transactionTypeLabel.text = transaction.getTransactionTypeName()
         if transaction.getTransactionType() == Transaction.typeSold || transaction.getTransactionType() == Transaction.typeSent || transaction.getTransactionType() == Transaction.typeTransferredFrom{

@@ -12,7 +12,7 @@ class SelectPairVC: UIViewController, UITableViewDataSource, UITableViewDelegate
     var coin: Coin!
     var coinHandler: CoinHandler!
     var sender: Any!
-    var currencies: [Currency] = []
+    var currencies: [String] = []
     var coins: [Coin] = []
     var isTransfer = false
         
@@ -37,8 +37,6 @@ class SelectPairVC: UIViewController, UITableViewDataSource, UITableViewDelegate
         }
         
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
@@ -46,7 +44,7 @@ class SelectPairVC: UIViewController, UITableViewDataSource, UITableViewDelegate
         if (isTransfer){
             coins = coinHandler.getCoins().filter({$0.getSymbol().lowercased() .prefix(searchText.count) == searchText.lowercased() || $0.getName().lowercased() .prefix(searchText.count) == searchText.lowercased()})
         }else{
-            currencies = coinHandler.getCurrencies().filter({$0.getSymbol().lowercased() .prefix(searchText.count) == searchText.lowercased() || $0.getId().lowercased() .prefix(searchText.count) == searchText.lowercased()})
+            currencies = coinHandler.getCurrencies().filter({$0.lowercased() .prefix(searchText.count) == searchText.lowercased() })
         }
        
         
@@ -81,7 +79,7 @@ class SelectPairVC: UIViewController, UITableViewDataSource, UITableViewDelegate
         let cell = UITableViewCell()
         
         if sender is AddBuyTransactionVC || sender is AddSellTransactionVC{
-            cell.textLabel!.text = "\(currencies[indexPath.row].getSymbol()) (\(currencies[indexPath.row].getId()))"
+            cell.textLabel!.text = "\(currencies[indexPath.row].uppercased()) (\(currencies[indexPath.row].uppercased()))"
         }
         else{
             cell.textLabel!.text = "\(coins[indexPath.row].getSymbol()) (\(coins[indexPath.row].getName()))"

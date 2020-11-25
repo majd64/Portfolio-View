@@ -8,15 +8,12 @@
 
 import Foundation
 
-struct AllCoinsModel: Decodable{
-    let data:[CoinModel]
-}
-
 struct CoinModel: Decodable{
     let id: String
     let symbol: String?
     let name: String?
-    let marketCapUsd: String?
-    let priceUsd: String?
-    let changePercent24Hr: String?
+    let image: String?
+    let current_price: Double?
+    let price_change_percentage_24h: Double?
+    let market_cap_rank: Int?
 }

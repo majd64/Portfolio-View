@@ -12,7 +12,7 @@ class CurrencySettingsVC: UITableViewController, UISearchBarDelegate{
     var coinHandler: CoinHandler!
     @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet var currenciesTableView: UITableView!
-    var currencies: [Currency] = []
+    var currencies: [String] = []
     
     override func viewDidLoad() {
         searchBar.delegate = self
@@ -26,20 +26,20 @@ class CurrencySettingsVC: UITableViewController, UISearchBarDelegate{
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell()
-        cell.textLabel!.text = "\(currencies[indexPath.row].getSymbol()) (\(currencies[indexPath.row].getId()))"
-        if (currencies[indexPath.row]).getId() == coinHandler.getPreferredCurrency()?.getId(){
+        cell.textLabel!.text = currencies[indexPath.row].uppercased()
+        if coinHandler.preferredCurrency == currencies[indexPath.row]{
             cell.accessoryType = .checkmark
         }
         return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        coinHandler.setPreferredCurrencyId(to: currencies[indexPath.row].getId())
+        coinHandler.preferredCurrency = currencies[indexPath.row]
         currenciesTableView.reloadData()
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        currencies = coinHandler.getCurrencies().filter({$0.getSymbol().lowercased() .prefix(searchText.count) == searchText.lowercased() || $0.getId().lowercased() .prefix(searchText.count) == searchText.lowercased()})
+        currencies = coinHandler.getCurrencies().filter({$0.lowercased() .prefix(searchText.count) == searchText.lowercased() })
         currenciesTableView.reloadData()
     }
     

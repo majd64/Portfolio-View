@@ -19,15 +19,18 @@ class SettingsVC: UITableViewController, UIPickerViewDelegate, UIPickerViewDataS
     override func viewDidLoad() {
         sortTypePickerView.delegate = self
         sortTypePickerView.dataSource = self
-        currencySettingsLabel.text = coinHandler.getPreferredCurrency()?.getSymbol()
-        sortTypePickerView.selectRow(coinHandler.sortTypeIds.firstIndex(of: coinHandler.getPreferredSortTypeId())!, inComponent: 0, animated: false)
+        super.viewDidLoad()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        currencySettingsLabel.text = coinHandler.preferredCurrency.uppercased()
+        sortTypePickerView.selectRow(coinHandler.sortTypeIds.firstIndex(of: coinHandler.preferredSortType)!, inComponent: 0, animated: false)
         let coloredCellsEnabled = defaults.bool(forKey: "coloredCells")
         if coloredCellsEnabled{
             coloredCellsToggle.isOn = true
         }else{
             coloredCellsToggle.isOn = false
         }
-        super.viewDidLoad()
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -67,7 +70,7 @@ class SettingsVC: UITableViewController, UIPickerViewDelegate, UIPickerViewDataS
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        coinHandler.setPreferredSortTypeId(to: coinHandler.sortTypeIds[row])
+        coinHandler.preferredSortType = coinHandler.sortTypeIds[row]
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {

@@ -8,12 +8,15 @@
 
 import UIKit
 
-class TransactionDetailVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class TransactionDetailVC: UIViewController, UITableViewDelegate, UITableViewDataSource, CoinHandlerDelegate {
     var transaction: Transaction!
     var coin: Coin!
     var coinHandler: CoinHandler!
     var hasNote = false
     var numberOfCells = 0
+    
+    
+    var pairPrice: Double = 0
 
     @IBOutlet weak var transactionDetailsTableView: UITableView!
     override func viewDidLoad() {
@@ -27,6 +30,13 @@ class TransactionDetailVC: UIViewController, UITableViewDelegate, UITableViewDat
         
         transactionDetailsTableView.delegate = self
         transactionDetailsTableView.dataSource = self
+        coinHandler.delegate = self
+        
+        if (transaction.getPairId() != coinHandler.preferredCurrency){
+            coinHandler.fetchCoinPrice(coinID: coin.getID(), currency: transaction.getPairId())
+        }
+        
+        
         super.viewDidLoad()
 
     }
@@ -57,19 +67,17 @@ class TransactionDetailVC: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if indexPath.row == 1 && (transaction.getTransactionType() == Transaction.typeBought || transaction.getTransactionType() == Transaction.typeSold) && transaction.getPairId() != coinHandler.getPreferredCurrency()?.getId(){
-            return 100
-        }
+    
         
         return 65
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let price: Double = coin.getPrice(withRate: coinHandler.getPreferredCurrency()?.getRateUsd() ?? 1) * transaction.getAmountOfParentCoin()
+        let price: Double = coin.getPrice() * transaction.getAmountOfParentCoin()
                 
-        let formattedPrice = "\(K.convertToMoneyFormat(price, symbol: coinHandler.getPreferredCurrency()?.getCurrencySymbol() ?? "$")) \(coinHandler.getPreferredCurrency()?.getSymbol() ?? "")"
+        let formattedPrice = "\(K.convertToMoneyFormat(price, currency: coinHandler.preferredCurrency))"
         
-        let amount = "\(transaction.getAmountOfParentCoin() as String) \(coin.getSymbol())"
+        let amount = "\(transaction.getAmountOfParentCoin() as String) \(coin.getSymbol().uppercased())"
         let amountOfPair = transaction.getAmountOfPair()
         if transaction.getTransactionType() == Transaction.typeBought || transaction.getTransactionType() == Transaction.typeSold{
             if indexPath.row == 0{
@@ -82,11 +90,11 @@ class TransactionDetailVC: UIViewController, UITableViewDelegate, UITableViewDat
             else if indexPath.row == 1{
                 let cell = tableView.dequeueReusableCell(withIdentifier: "nowCell") as! NowCell
                 cell.priceInPrefferedCurrencyLabel.text = formattedPrice
-                if (transaction.getPairId() != coinHandler.getPreferredCurrency()?.getId()){
-                    if let pair = coinHandler.getCurrency(id: transaction.getPairId()){
-                        let price = coin.getPrice(withRate: pair.getRateUsd()) * transaction.getAmountOfParentCoin()
-                        cell.priceInPairCurrencyLabel.text = "\(K.convertToMoneyFormat(price, symbol: pair.getCurrencySymbol())) \(pair.getSymbol())"
-                    }
+                if (transaction.getPairId() != coinHandler.preferredCurrency){
+                    let price = pairPrice * transaction.getAmountOfParentCoin()
+                    cell.priceInPairCurrencyLabel.text = "\(K.convertToMoneyFormat(price, currency: transaction.getPairId())) \(transaction.getPairId().uppercased())"
+                    
+                    
                 }else{
                     cell.priceInPairCurrencyLabel.isHidden = true
                 }
@@ -94,9 +102,7 @@ class TransactionDetailVC: UIViewController, UITableViewDelegate, UITableViewDat
             }else if indexPath.row == 2{
                 let cell = tableView.dequeueReusableCell(withIdentifier: "thenCell") as! ThenCell
                 cell.headerLabel.text = transaction.getTransactionType() == Transaction.typeBought ? "Spent" : "Recieved"
-                if let pair = coinHandler.getCurrency(id: transaction.getPairId()){
-                    cell.amountOfPairLabel.text = "\(K.convertToMoneyFormat(amountOfPair, symbol: pair.getCurrencySymbol())) \(pair.getSymbol())"
-                }
+                cell.amountOfPairLabel.text = "\(K.convertToMoneyFormat(amountOfPair, currency: transaction.getPairId()))"
                 return cell
             }else if indexPath.row == 3 && hasNote{
                 let cell = tableView.dequeueReusableCell(withIdentifier: "notesCell") as! NotesCell
@@ -135,7 +141,7 @@ class TransactionDetailVC: UIViewController, UITableViewDelegate, UITableViewDat
                 cell.headerLabel.text = "Transfer"
                 cell.amountLabel.text = transaction.getTransactionType() == Transaction.typeTransferredFrom ? "- \(amount)" : "+ \(amount)"
                 if let pairCoin = coinHandler.getCoin(id: transaction.getPairId()){
-                    cell.amountOfPairLabel.text = transaction.getTransactionType() == Transaction.typeTransferredFrom ? "- \(amountOfPair) \(pairCoin.getSymbol())" : "+ \(amountOfPair) \(pairCoin.getSymbol())"
+                    cell.amountOfPairLabel.text = transaction.getTransactionType() == Transaction.typeTransferredFrom ? "- \(amountOfPair) \(pairCoin.getSymbol().uppercased())" : "+ \(amountOfPair) \(pairCoin.getSymbol().uppercased())"
                 }
                 return cell
             }else if indexPath.row == 1 && hasNote{
@@ -158,4 +164,13 @@ class TransactionDetailVC: UIViewController, UITableViewDelegate, UITableViewDat
         }
         
     }
+    
+    func didUpdateCoinsData() {}
+    
+    func didFetchCoinPrice(price: Double) {
+        pairPrice = price
+        transactionDetailsTableView.reloadData()
+    }
+    
+    func didFailWithError(error: Error) {}
 }

@@ -45,11 +45,11 @@ class AddTransferTransactionVC: UITableViewController, UITextFieldDelegate {
     }
     
     private func updateLabelTexts(){
-        exchangeFromSelectedLabel.text = coin.getSymbol()
-        exchangeToSelectedLabel.text = otherCoin.getSymbol()
+        exchangeFromSelectedLabel.text = coin.getSymbol().uppercased()
+        exchangeToSelectedLabel.text = otherCoin.getSymbol().uppercased()
         
-        totalSentLabel.text = "Total sent (\(coin.getSymbol()))"
-        totalRecievedLabel.text = "Total recieved (\(otherCoin.getSymbol()))"
+        totalSentLabel.text = "Total sent (\(coin.getSymbol().uppercased()))"
+        totalRecievedLabel.text = "Total recieved (\(otherCoin.getSymbol().uppercased()))"
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {

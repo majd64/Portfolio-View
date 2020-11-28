@@ -41,6 +41,8 @@ class ViewController: UIViewController, ChartViewDelegate, CanRefresh {
         coinTableView.refreshControl = myRefreshControl
         self.autoCoinDataRefreshTimer = Timer.scheduledTimer(timeInterval: 21, target: self, selector: #selector(self.requestNewCoinData), userInfo: nil, repeats: true)
         initPieChart()
+        
+        view.window?.overrideUserInterfaceStyle = .dark
 
         super.viewDidLoad()
     }
@@ -74,11 +76,13 @@ class ViewController: UIViewController, ChartViewDelegate, CanRefresh {
         
         let balanceLabel: NSMutableAttributedString = NSMutableAttributedString()
         
+        
+        
         let balStr = NSAttributedString(string: K.convertToMoneyFormat(coinHandler.getTotalBalanceValue(), currency: coinHandler.preferredCurrency), attributes: balanceAttributes)
-//        let balBTCStr = NSAttributedString(string: balBTC, attributes: balanceInBTCAttributes)
+        let balSecondaryStr = NSAttributedString(string: "\(K.convertToMoneyFormat(coinHandler.convertCurrencies(from: coinHandler.preferredCurrency, to: coinHandler.secondaryCurrency, amount: coinHandler.getTotalBalanceValue()) ?? 0, currency: coinHandler.secondaryCurrency)) \(coinHandler.secondaryCurrency.uppercased())" , attributes: balanceInBTCAttributes)
         balanceLabel.append(balStr)
         balanceLabel.append(NSAttributedString(string: "\n"))
-//        balanceLabel.append(balBTCStr)
+        balanceLabel.append(balSecondaryStr)
         
         pieChart.centerAttributedText = balanceLabel
     }
@@ -134,19 +138,28 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource{
         let coin: Coin = coinHandler.getCoins()[indexPath.row]
         
         cell.cellView.layer.cornerRadius = 15
-        cell.iconImage.image = UIImage(named: coin.getID())
+        cell.iconImage.image = coin.getImage()
         
         if coloredCellsEnabled{
-            cell.cellView.backgroundColor = UIImage(named: coin.getID())?.averageColor?.withAlphaComponent(0.5) ?? UIColor.gray.withAlphaComponent(0.50)
+//            cell.cellView.backgroundColor = coin.getImage()?.averageColor?.withAlphaComponent(0.5) ?? UIColor.gray.withAlphaComponent(0.50)
+            let image = coin.getImage()
+
+            image?.getColors { colors in
+                cell.cellView.backgroundColor = colors?.background
+//              backgroundView.backgroundColor = colors.background
+//              mainLabel.textColor = colors.primary
+//              secondaryLabel.textColor = colors.secondary
+//              detailLabel.textColor = colors.detail
+            }
         }else{
             cell.cellView.backgroundColor = UIColor(named: "Color")
         }
         cell.nameLabel.text = coin.getName()
-        cell.symbolLabel.text = coin.getSymbol()
+        cell.symbolLabel.text = coin.getSymbol().uppercased()
         cell.priceLabel.text = K.convertToCoinPrice(coin.getPrice(), currency: coinHandler.preferredCurrency)
         cell.balanceLabel.text = coin.getBalance()
         cell.balanceValueLabel.text = K.convertToMoneyFormat(coin.getBalanceValue(), currency: coinHandler.preferredCurrency)
-        cell.h24ChangeLabel.text = String(format: "%.2f", coin.getChangePercentage24h())
+        cell.h24ChangeLabel.text = coin.getChangePercentage24h()
         
         return cell
     }

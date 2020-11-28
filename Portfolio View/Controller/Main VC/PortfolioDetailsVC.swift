@@ -32,7 +32,7 @@ class PortfolioDetailsVC: UIViewController, UITableViewDelegate, UITableViewData
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "portfolioPercentageCell") as! PortfolioPercentageCell
         if let coin: Coin = coinHandler.getCoin(id: percentages[indexPath.row].coinID){
-            cell.coinIcon.image = UIImage(named: coin.getID())
+            cell.coinIcon.image = coin.getImage()
             cell.coinTicker.text = coin.getSymbol()
             cell.percentage.text = String(percentages[indexPath.row].percentage) + "%"
             

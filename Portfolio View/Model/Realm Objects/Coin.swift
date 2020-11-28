@@ -15,6 +15,7 @@ class Coin: Object{
     @objc dynamic private var name: String = ""
     @objc dynamic private var image: String = ""
     @objc dynamic private var price: Double = 0
+    @objc dynamic private var secondaryPrice: Double = 0
     @objc dynamic private var marketCapRank: Int = 0
     @objc dynamic private var changePercentage24h: Double = 0
     @objc dynamic private var balance: Double = 0
@@ -24,11 +25,18 @@ class Coin: Object{
     
     private let transactions = List<Transaction>()
 
-    convenience init(id: String, symbol: String, name: String) {
+    convenience init(id: String, symbol: String, name: String, image: String) {
         self.init()
         self.id = id
         self.symbol = symbol
         self.name = name
+        self.image = image
+        do{
+            try self.iconImage = NSData(contentsOf: (URL(string: image)!))
+        }catch{
+            
+        }
+        
     }
     
     func getID() -> String{
@@ -43,12 +51,25 @@ class Coin: Object{
         return name
     }
     
+    func getImage() -> UIImage?{
+        return UIImage(data: self.iconImage as Data)
+    }
+    
     func getPrice() -> Double{
         return price
     }
     
-    func getChangePercentage24h() -> Double{
-        return changePercentage24h
+    func getSecondaryPrice() -> Double{
+        return secondaryPrice
+    }
+    
+    func getChangePercentage24h() -> String{
+        if (changePercentage24h > 0){
+            
+            return "+\(String(format: "%.2f", changePercentage24h))%"
+        }else{
+            return "\(String(format: "%.2f", changePercentage24h))%"
+        }
     }
     
     func getTransactions() -> [Transaction]{
@@ -69,6 +90,7 @@ class Coin: Object{
         }
         calculateBalanceValue()
     }
+    
     
     func setChangePercent24h(_ value: Double){
         do{

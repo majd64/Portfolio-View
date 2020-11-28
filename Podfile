@@ -6,21 +6,8 @@ target 'Portfolio View' do
   use_frameworks!
 
   # Pods for Portfolio View
-	pod "RealmSwift"
-  pod "Charts"
-  pod "StaticDataTableViewController"
-  
-  source 'https://github.com/facebook/facebook-ios-sdk'
-  source 'https://github.com/CocoaPods/Specs.git'
-
-
-  
-  pod 'FBSDKCoreKit', '~> 7.2'
-
-  pod 'FBSDKLoginKit', '~> 7.2'
-  pod 'FBSDKShareKit', '~> 7.2'
-
-  pod 'FBSDKGamingServiceKit', '~> 7.2'
-  
+	 pod "RealmSwift"
+   pod "Charts"
+   pod "StaticDataTableViewController"
 
 end

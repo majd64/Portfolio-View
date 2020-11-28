@@ -90,7 +90,7 @@ extension CoinVC: UITableViewDelegate, UITableViewDataSource{
         }
         let cell = tableView.dequeueReusableCell(withIdentifier: "transactionCell") as! TransactionCell
         let transaction: Transaction = coin.getTransactions()[indexPath.row - 1]
-        cell.amountOfCoinLabel.text = "\(transaction.getAmountOfParentCoin() as String) \(coin.getSymbol())"
+        cell.amountOfCoinLabel.text = "\(transaction.getAmountOfParentCoin() as String) \(coin.getSymbol().uppercased())"
         let value = coin.getPrice() * transaction.getAmountOfParentCoin()
         let formattedAmountOfFiat = K.convertToCoinPrice(value, currency: coinHandler.preferredCurrency)
         cell.amountOfFiatLabel.text = formattedAmountOfFiat

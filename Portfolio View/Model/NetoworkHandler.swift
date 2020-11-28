@@ -27,10 +27,13 @@ struct NetworkHandler{
         performRequest(with: url, requestType: "currencies", otherInfo: nil)
     }
     
-    func fetchCoinPrice(coinID: String, currency: String){
-        let url = "https://api.coingecko.com/api/v3/simple/price?ids=\(coinID)&vs_currencies=\(currency)"
-        performRequest(with: url, requestType: "coin", otherInfo: nil)
+    func fetchExchangeRates(){
+        let url = "https://api.coincap.io/v2/rates"
+        performRequest(with: url, requestType: "rates", otherInfo: nil)
     }
+    
+    
+
     
     func performRequest(with urlString: String, requestType: String, otherInfo: String?){
         if let url = URL(string: urlString){
@@ -56,11 +59,12 @@ struct NetworkHandler{
                             self.delegate?.didFetchCurrencies(self, currencies: currencies)
                         }
                     }
-                    else if requestType == "coin"{
-                        if let price: Double = self.parseJSON(safeData){
-                            self.delegate?.didFetchCoinPrice(networkHandler: self, price: price)
+                    else if requestType == "rates"{
+                        if let rates: [ExchnageRate] = self.parseJSON(safeData){
+                            self.delegate?.didFetchExchangeRates(self, rates: rates)
                         }
                     }
+                    
                 }
             }
             task.resume()
@@ -100,16 +104,18 @@ struct NetworkHandler{
         }
     }
     
-    func parseJSON(_ data: Data) -> Double?{
+    func parseJSON(_ data: Data) -> [ExchnageRate]?{
         let decoder = JSONDecoder()
         do{
-            let price: CoinPriceModel = try decoder.decode(CoinPriceModel.self, from: data)
-            return price.price.price
+            let rates: ExchangeRates = try decoder.decode(ExchangeRates.self, from: data)
+            return rates.data
         }catch{
             delegate?.didFailWithError(error: error)
             return nil
         }
     }
+    
+
 }
 
 protocol NetworkHandlerDelegate{
@@ -117,5 +123,5 @@ protocol NetworkHandlerDelegate{
     func didFailWithError(error: Error)
     func didUpdateChartData(_ networkHandler: NetworkHandler, candlesData: ChartModel, timeFrame: String)
     func didFetchCurrencies(_ networkHandler: NetworkHandler, currencies: [String])
-    func didFetchCoinPrice( networkHandler: NetworkHandler, price: Double)
+    func didFetchExchangeRates(_ networkHandler: NetworkHandler, rates: [ExchnageRate])
 }

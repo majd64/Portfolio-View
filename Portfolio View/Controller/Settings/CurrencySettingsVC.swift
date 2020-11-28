@@ -13,8 +13,10 @@ class CurrencySettingsVC: UITableViewController, UISearchBarDelegate{
     @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet var currenciesTableView: UITableView!
     var currencies: [String] = []
+    var isSecondaryCurrency = false
     
     override func viewDidLoad() {
+        print (isSecondaryCurrency)
         searchBar.delegate = self
         currencies = coinHandler.getCurrencies()
         super.viewDidLoad()
@@ -27,14 +29,21 @@ class CurrencySettingsVC: UITableViewController, UISearchBarDelegate{
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell()
         cell.textLabel!.text = currencies[indexPath.row].uppercased()
-        if coinHandler.preferredCurrency == currencies[indexPath.row]{
+        if !isSecondaryCurrency && coinHandler.preferredCurrency == currencies[indexPath.row]{
+            cell.accessoryType = .checkmark
+        }
+        else if isSecondaryCurrency && coinHandler.secondaryCurrency == currencies[indexPath.row]{
             cell.accessoryType = .checkmark
         }
         return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        coinHandler.preferredCurrency = currencies[indexPath.row]
+        if isSecondaryCurrency{
+            coinHandler.secondaryCurrency = currencies[indexPath.row]
+        }else{
+            coinHandler.preferredCurrency = currencies[indexPath.row]
+        }
         currenciesTableView.reloadData()
     }
     

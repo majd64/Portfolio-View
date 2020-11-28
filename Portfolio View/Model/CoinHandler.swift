@@ -19,6 +19,7 @@ class CoinHandler{
     private var networkHandler: NetworkHandler = NetworkHandler()
     private var coins: Results<Coin>!
     private var currencies: [String] = []
+    private var exchangeRates: [ExchnageRate] = []
     
     var preferredCurrency: String{
         get{
@@ -29,6 +30,19 @@ class CoinHandler{
             return "usd"
         }set{
             defaults.set(newValue, forKey: "preferredCurrency")
+            fetchCoinData()
+        }
+    }
+    
+    var secondaryCurrency: String{
+        get{
+            if let rate = defaults.string(forKey: "secondaryCurrency"){
+                return rate
+            }
+            defaults.set("btc", forKey: "secondaryCurrency")
+            return "usd"
+        }set{
+            defaults.set(newValue, forKey: "secondaryCurrency")
             fetchCoinData()
         }
     }
@@ -56,6 +70,7 @@ class CoinHandler{
         sortCoins()
         fetchCoinData()
         networkHandler.fetchCurrencies()
+        networkHandler.fetchExchangeRates()
     }
     
     func sortCoins(){
@@ -97,7 +112,7 @@ class CoinHandler{
     func refresh(){
         refreshDelegate?.refresh()
     }
-    
+
     func getPortfolioPercentages() -> [(coinID: String, percentage: Double)]{
         var percentages: [(coinID: String, percentage: Double)] = []
         
@@ -120,13 +135,33 @@ class CoinHandler{
             if coin.getBalanceValue() != 0{
                 let entry: PieChartDataEntry = PieChartDataEntry(value: coin.getBalanceValue())
                 pieChartEntries.append(entry)
-                let col: UIColor = (UIImage(named: coin.getID())?.averageColor)?.withAlphaComponent(1) ?? UIColor.white
+                let col: UIColor = coin.getImage()?.averageColor?.withAlphaComponent(1) ?? UIColor.white
                 pieChartEntryColors.append(col)
             }
         }
         let chartDataSet = PieChartDataSet(entries: pieChartEntries, label: nil)
         chartDataSet.colors = pieChartEntryColors
         return chartDataSet
+    }
+    
+    func convertCurrencies(from: String, to: String, amount: Double) -> Double?{
+        print(from)
+        print(to)
+        for i: ExchnageRate in exchangeRates{
+            if i.symbol.uppercased() == from.uppercased(){
+                for l: ExchnageRate in exchangeRates{
+                    if l.symbol.uppercased() == to.uppercased(){
+                        let fromPrice = Double(i.rateUsd) ?? 1
+                        let toPrice = Double(l.rateUsd) ?? 1
+                        print(fromPrice)
+                        print(toPrice)
+                  
+                        return fromPrice/toPrice*amount
+                    }
+                }
+            }
+        }
+        return nil
     }
 }
 
@@ -141,14 +176,11 @@ extension CoinHandler: NetworkHandlerDelegate{
         self.currencies = currencies
     }
     
-    func fetchCoinPrice(coinID: String, currency: String){
-        networkHandler.fetchCoinPrice(coinID: coinID, currency: currency)
+    func didFetchExchangeRates(_ networkHandler: NetworkHandler, rates: [ExchnageRate]){
+        exchangeRates = rates
     }
     
-    func didFetchCoinPrice(networkHandler: NetworkHandler, price: Double) {
-        delegate?.didFetchCoinPrice(price: price)
-    }
-
+    
     func fetchChartData(id: String, timeFrame: String){
         var days = ""
         switch timeFrame{
@@ -179,7 +211,7 @@ extension CoinHandler: NetworkHandlerDelegate{
             for coinData: CoinModel in coinsData{
                 var coin: Coin? = self.getCoin(id: coinData.id)
                 if coin == nil {
-                    coin = Coin(id: coinData.id, symbol: coinData.symbol ?? "", name: coinData.name ?? "")
+                    coin = Coin(id: coinData.id, symbol: coinData.symbol ?? "", name: coinData.name ?? "", image: coinData.image ?? "")
                     do{
                         try self.realm.write(){
                             self.realm.add(coin!)

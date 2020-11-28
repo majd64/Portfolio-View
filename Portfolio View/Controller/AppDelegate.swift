@@ -18,8 +18,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         let deviceTokenString = deviceToken.reduce("", {$0 + String(format: "%02X", $1)})
         defaults.set(deviceTokenString, forKey: "deviceToken")
         
-        
-        
         let url = URL(string: "https://www.portfolioview.ca/alerts/registerdevice")!
         var request = URLRequest(url: url)
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")

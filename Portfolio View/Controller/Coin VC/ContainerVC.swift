@@ -72,6 +72,17 @@ class ContainerVC: UIViewController, CoinHandlerDelegate, ChartViewDelegate{
     
     override func viewWillAppear(_ animated: Bool) {
         coinHandler.delegate = self
+        if coinHandler.appearance == "dark"{
+            overrideUserInterfaceStyle = .dark
+            self.navigationController?.overrideUserInterfaceStyle = .dark
+        }
+        else if coinHandler.appearance == "light"{
+            overrideUserInterfaceStyle = .light
+            self.navigationController?.overrideUserInterfaceStyle = .light
+        }else{
+            overrideUserInterfaceStyle = .unspecified
+            self.navigationController?.overrideUserInterfaceStyle = .unspecified
+        }
     }
     
     func didUpdateCoinsData() {
@@ -111,7 +122,9 @@ extension ContainerVC: CanUpdateLineChartData{
         selectedTimeFrameIndex = sender.selectedSegmentIndex
         h24ChangeLabel.text = lineChartDataSets[selectedTimeFrameIndex].change
         lineChart.data = lineChartDataSets[selectedTimeFrameIndex].data
-        self.lineChart.animate(xAxisDuration: 0.6)
+        self.lineChart.animate(xAxisDuration: 0.7)
+        self.lineChart.resetViewPortOffsets()
+        self.lineChart.resetZoom()
     }
     
     func chartValueSelected(_ chartView: ChartViewBase, entry: ChartDataEntry, highlight: Highlight) {
@@ -129,34 +142,35 @@ extension ContainerVC: CanUpdateLineChartData{
             dateFormat = "yyyy-MMM-dd"
         }
         format.dateFormat = dateFormat
-        h24ChangeLabel.text = format.string(from: NSDate(timeIntervalSince1970: Double(String(entry.x).prefix(10))!) as Date)
-        generator.impactOccurred()
+        
+//        generator.impactOccurred()
     }
     
     
     
     func didUpdateLineChartDataSet(dataSet: LineChartDataSet, timeFrame: String) {
         DispatchQueue.main.async {
-            let col:CGColor
+//            let col:CGColor
             
+            var col = self.coin.getColor()
             if self.traitCollection.userInterfaceStyle == .dark {
-                col = self.coin.getImage()?.averageColor?.lighter()?.cgColor ?? UIColor.gray.cgColor
+                col = col.lighter() ?? UIColor.gray
             }else{
-                col = self.coin.getImage()?.averageColor?.darker()?.cgColor ?? UIColor.gray.cgColor
+                col = col.darker() ?? UIColor.gray
             }
-            dataSet.colors = [NSUIColor.init(cgColor: col)]
+            dataSet.colors = [NSUIColor.init(cgColor: col.cgColor )]
             dataSet.drawCirclesEnabled = false
             dataSet.drawValuesEnabled = false
             dataSet.lineWidth = 1.5
-            let gradientColors = [col, UIColor.clear.cgColor] as CFArray
-            let colorLocations:[CGFloat] = [1.0, 0]
+            let gradientColors = [col.cgColor, UIColor.clear.cgColor] as CFArray
+            let colorLocations:[CGFloat] = [0.0, 1.0]
             let gradient:CGGradient? = CGGradient.init(colorsSpace: CGColorSpaceCreateDeviceRGB(), colors: gradientColors, locations: colorLocations)
             if let grade = gradient{
                 dataSet.fill = Fill.fillWithLinearGradient(grade, angle: 90.0)
                 dataSet.drawFilledEnabled = true
             }
             
-            dataSet.highlightColor = UIColor(cgColor: col)
+            dataSet.highlightColor = UIColor(cgColor: col.cgColor )
             dataSet.highlightLineWidth = 1
             
             
@@ -191,7 +205,7 @@ extension ContainerVC: CanUpdateLineChartData{
                     if i == self.selectedTimeFrameIndex{
                         self.h24ChangeLabel.text = self.lineChartDataSets[self.selectedTimeFrameIndex].change
                         self.lineChart.data = self.lineChartDataSets[self.selectedTimeFrameIndex].data
-                        self.lineChart.animate(xAxisDuration: 0.6)
+                        self.lineChart.animate(xAxisDuration: 0.7)
                     }
                 }
             }
@@ -214,7 +228,7 @@ extension ContainerVC: CanUpdateLineChartData{
     
     func panGestureEnded(_ chartView: ChartViewBase) {
         priceLabel.text = K.convertToCoinPrice(coin.getPrice(), currency: coinHandler.preferredCurrency)
-        h24ChangeLabel.text = String(format: "%.2f", coin.getChangePercentage24h())
+        h24ChangeLabel.text = lineChartDataSets[selectedTimeFrameIndex].change
         lineChart.highlightValue(nil)
     }
     

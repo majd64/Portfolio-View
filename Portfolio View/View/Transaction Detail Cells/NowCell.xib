@@ -1,59 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17126"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="nowCell" rowHeight="77" id="2mk-BR-vJ0" customClass="NowCell" customModule="Portfolio_View" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="414" height="77"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="nowCell" rowHeight="100" id="2mk-BR-vJ0" customClass="NowCell" customModule="Portfolio_View" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="414" height="100"/>
             <autoresizingMask key="autoresizingMask"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="2mk-BR-vJ0" id="rfP-1F-n2j">
-                <rect key="frame" x="0.0" y="0.0" width="414" height="77"/>
+                <rect key="frame" x="0.0" y="0.0" width="414" height="100"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jaI-NB-RLq">
-                        <rect key="frame" x="10" y="5" width="394" height="67"/>
+                        <rect key="frame" x="10" y="5" width="394" height="90"/>
                         <subviews>
-                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillProportionally" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="aif-TK-3Qk">
-                                <rect key="frame" x="0.0" y="0.0" width="394" height="67"/>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalSpacing" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="aif-TK-3Qk">
+                                <rect key="frame" x="0.0" y="10.5" width="394" height="69"/>
                                 <subviews>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Now" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Prl-dY-zsT">
-                                        <rect key="frame" x="181.5" y="0.0" width="31" height="20.5"/>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Current price" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Prl-dY-zsT">
+                                        <rect key="frame" x="152" y="0.0" width="90.5" height="18"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                         <color key="textColor" systemColor="systemGray2Color"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="$555.55" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5Z2-YT-DVj">
-                                        <rect key="frame" x="165" y="20.5" width="64.5" height="23"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                        <nil key="textColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="€5354.43" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="536-nn-VNe">
-                                        <rect key="frame" x="159.5" y="43.5" width="75.5" height="23.5"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                        <nil key="textColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
+                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalSpacing" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="wEy-5v-gz7">
+                                        <rect key="frame" x="159.5" y="28" width="75.5" height="41"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="$555.55" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5Z2-YT-DVj">
+                                                <rect key="frame" x="5.5" y="0.0" width="64.5" height="20.5"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="€5354.43" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="536-nn-VNe">
+                                                <rect key="frame" x="0.0" y="20.5" width="75.5" height="20.5"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                        </subviews>
+                                    </stackView>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstItem="5Z2-YT-DVj" firstAttribute="centerX" secondItem="aif-TK-3Qk" secondAttribute="centerX" id="4yk-PW-iLa"/>
+                                    <constraint firstItem="wEy-5v-gz7" firstAttribute="top" secondItem="Prl-dY-zsT" secondAttribute="bottom" constant="10" id="cWM-DK-7Ew"/>
                                     <constraint firstItem="Prl-dY-zsT" firstAttribute="centerX" secondItem="aif-TK-3Qk" secondAttribute="centerX" id="oJt-Uq-AuB"/>
                                 </constraints>
                             </stackView>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="aif-TK-3Qk" firstAttribute="top" secondItem="jaI-NB-RLq" secondAttribute="top" id="0te-LI-9KA"/>
                             <constraint firstItem="aif-TK-3Qk" firstAttribute="centerX" secondItem="jaI-NB-RLq" secondAttribute="centerX" id="7OT-e4-mFX"/>
                             <constraint firstItem="aif-TK-3Qk" firstAttribute="centerY" secondItem="jaI-NB-RLq" secondAttribute="centerY" id="Dsz-eg-WZd"/>
-                            <constraint firstAttribute="bottom" secondItem="aif-TK-3Qk" secondAttribute="bottom" id="HE4-OT-5Vm"/>
                             <constraint firstAttribute="trailing" secondItem="aif-TK-3Qk" secondAttribute="trailing" id="Jpk-fy-Gax"/>
                             <constraint firstItem="aif-TK-3Qk" firstAttribute="leading" secondItem="jaI-NB-RLq" secondAttribute="leading" id="xoh-2z-8Nt"/>
                         </constraints>
@@ -69,10 +72,11 @@
                 </constraints>
             </tableViewCellContentView>
             <connections>
-                <outlet property="priceInPairCurrencyLabel" destination="536-nn-VNe" id="hjR-h1-v8x"/>
-                <outlet property="priceInPrefferedCurrencyLabel" destination="5Z2-YT-DVj" id="Cps-eE-4hJ"/>
+                <outlet property="firstLabel" destination="5Z2-YT-DVj" id="Cps-eE-4hJ"/>
+                <outlet property="secondLabel" destination="536-nn-VNe" id="hjR-h1-v8x"/>
+                <outlet property="titleLabel" destination="Prl-dY-zsT" id="gdo-K0-ays"/>
             </connections>
-            <point key="canvasLocation" x="318.84057971014494" y="175.78125"/>
+            <point key="canvasLocation" x="318.84057971014494" y="183.48214285714286"/>
         </tableViewCell>
     </objects>
     <resources>

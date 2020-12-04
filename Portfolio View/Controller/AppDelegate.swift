@@ -18,7 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         let deviceTokenString = deviceToken.reduce("", {$0 + String(format: "%02X", $1)})
         defaults.set(deviceTokenString, forKey: "deviceToken")
         
-        let url = URL(string: "https://www.portfolioview.ca/alerts/registerdevice")!
+        let url = URL(string: "\(K.api)/alerts/registerdevice")!
         var request = URLRequest(url: url)
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         request.httpMethod = "POST"
@@ -36,20 +36,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             }
 
             guard (200 ... 299) ~= response.statusCode else {                    // check for http errors
-                print("statusCode should be 2xx, but is \(response.statusCode)")
-                print("response = \(response)")
                 return
             }
 
             let responseString = String(data: data, encoding: .utf8)
-            print("responseString = \(responseString)")
+
         }
 
         task.resume()
         
         
         
-        print("success in registering for remote notifications with token \(deviceTokenString)")
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
@@ -57,16 +54,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     }
     
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        print("Received push notification: \(userInfo)")
         let aps = userInfo["aps"] as! [String: Any]
-        print("\(aps)")
     }
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        print("handling notification")
         if let notification = response.notification.request.content.userInfo as? [String:AnyObject] {
             let message = parseRemoteNotification(notification: notification)
-            print(message as Any)
         }
         completionHandler()
     }
@@ -93,7 +86,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
         
         do{
-            _ = try Realm()
+            
+//            _ = try Realm()
 //                print(Realm.Configuration.defaultConfiguration.fileURL)
         }catch{
             print("Error initializing new realm, \(error)")

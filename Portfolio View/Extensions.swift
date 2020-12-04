@@ -95,6 +95,10 @@ extension CharacterSet {
 
 
 
+//  UIImageColors.swift
+//  https://github.com/jathu/UIImageColors
+//
+//  Created by Jathu Satkunarajah (@jathu) on 2015-06-11 - Toronto
 
 
 #if os(OSX)
@@ -438,4 +442,6 @@ extension UIImage {
         )
     }
 }
+
+
 

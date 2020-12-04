@@ -22,6 +22,20 @@ class CurrencySettingsVC: UITableViewController, UISearchBarDelegate{
         super.viewDidLoad()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        if coinHandler.appearance == "dark"{
+            overrideUserInterfaceStyle = .dark
+            self.navigationController?.overrideUserInterfaceStyle = .dark
+        }
+        else if coinHandler.appearance == "light"{
+            overrideUserInterfaceStyle = .light
+            self.navigationController?.overrideUserInterfaceStyle = .light
+        }else{
+            overrideUserInterfaceStyle = .unspecified
+            self.navigationController?.overrideUserInterfaceStyle = .unspecified
+        }
+    }
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return currencies.count
     }

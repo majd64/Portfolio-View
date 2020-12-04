@@ -23,6 +23,20 @@ class TransactionVC: UIViewController {
         super.viewDidLoad()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        if coinHandler.appearance == "dark"{
+            overrideUserInterfaceStyle = .dark
+            self.navigationController?.overrideUserInterfaceStyle = .dark
+        }
+        else if coinHandler.appearance == "light"{
+            overrideUserInterfaceStyle = .light
+            self.navigationController?.overrideUserInterfaceStyle = .light
+        }else{
+            overrideUserInterfaceStyle = .unspecified
+            self.navigationController?.overrideUserInterfaceStyle = .unspecified
+        }
+    }
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "goToAddBuyTransactionVC"{
             let dest = segue.destination as! AddBuyTransactionVC

@@ -14,6 +14,10 @@ struct CoinModel: Decodable{
     let name: String?
     let image: String?
     let current_price: Double?
+    let price_change_percentage_1h_in_currency: Double?
     let price_change_percentage_24h: Double?
+    let price_change_percentage_7d_in_currency: Double?
+    let price_change_percentage_30d_in_currency: Double?
+    let price_change_percentage_1y_in_currency: Double?
     let market_cap_rank: Int?
 }

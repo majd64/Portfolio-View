@@ -54,7 +54,7 @@ class AddSellTransactionVC: UITableViewController, UITextFieldDelegate{
     
     private func reloadTableView(){
         selectedPairLabel.text = selectedFiat.uppercased()
-        amountRecievedLabel.text = "Amount recieved (\(String(describing: selectedFiat.uppercased()))))"
+        amountRecievedLabel.text = "Amount recieved (\(String(describing: selectedFiat.uppercased())))"
         if transactionType == Transaction.typeSold{
             amountSoldLabel.text = "Amount sold (\(coin.getSymbol().uppercased()))"
             pairCell.isUserInteractionEnabled = true

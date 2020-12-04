@@ -22,8 +22,16 @@ class Coin: Object{
     @objc dynamic private var balanceValue: Double = 0
     @objc dynamic private var isPinned: Bool = false
     @objc dynamic private var iconImage: NSData = NSData()
+    @objc dynamic private var colorHex: String = "D3D3D3"
+    @objc dynamic private var coinVersion: Int = 0
     
-    private let transactions = List<Transaction>()
+    @objc dynamic private var changePercentage1h: Double = 0
+    @objc dynamic private var changePercentage1w: Double = 0
+    @objc dynamic private var changePercentage1m: Double = 0
+    @objc dynamic private var changePercentage1y: Double = 0
+    
+    
+    let transactions = List<Transaction>()
 
     convenience init(id: String, symbol: String, name: String, image: String) {
         self.init()
@@ -33,10 +41,35 @@ class Coin: Object{
         self.image = image
         do{
             try self.iconImage = NSData(contentsOf: (URL(string: image)!))
-        }catch{
-            
-        }
+        }catch{}
         
+        self.getImage()?.getColors { colors in
+//          backgroundView.backgroundColor = colors.background
+            do{
+                try self.realm!.write(){
+                    self.colorHex = K.hexStringFromColor(color: colors?.background.withAlphaComponent(0.8) ?? UIColor.gray)
+                }
+            }catch{
+                fatalError("error saving: \(error)")
+            }
+            
+//          secondaryLabel.textColor = colors.secondary
+//          detailLabel.textColor = colors.detail
+        }
+    }
+    
+    func getCoinVersion() -> Int{
+        return coinVersion
+    }
+    
+    func setCoinVersion(_ value: Int){
+        do{
+            try realm!.write(){
+                coinVersion = value
+            }
+        }catch{
+            print("error saving: \(error)")
+        }
     }
     
     func getID() -> String{
@@ -53,6 +86,10 @@ class Coin: Object{
     
     func getImage() -> UIImage?{
         return UIImage(data: self.iconImage as Data)
+    }
+    
+    func getColor() -> UIColor{
+        return K.colorWithHexString(hexString: self.colorHex)
     }
     
     func getPrice() -> Double{
@@ -72,6 +109,11 @@ class Coin: Object{
         }
     }
     
+    func getChangePercentage24h() -> Double{
+        return changePercentage24h
+    }
+    
+    
     func getTransactions() -> [Transaction]{
         return Array(transactions.sorted(byKeyPath: "date", ascending: false))
     }
@@ -90,7 +132,6 @@ class Coin: Object{
         }
         calculateBalanceValue()
     }
-    
     
     func setChangePercent24h(_ value: Double){
         do{
@@ -189,4 +230,69 @@ class Coin: Object{
     func getBalanceValue() -> Double{
         return price * balance
     }
+    
+    //=====
+    
+    func getChangePercentage1h() -> Double{
+        return changePercentage1h
+    }
+    
+    
+    func setChangePercent1h(_ value: Double){
+        do{
+            try realm!.write(){
+                changePercentage1h = value
+            }
+        }catch{
+            print("error saving: \(error)")
+        }
+    }
+    
+    func getChangePercentage1w() -> Double{
+        return changePercentage1w
+    }
+    
+    
+    func setChangePercent1w(_ value: Double){
+        do{
+            try realm!.write(){
+                changePercentage1w = value
+            }
+        }catch{
+            print("error saving: \(error)")
+        }
+    }
+    
+    func getChangePercentage1m() -> Double{
+        return changePercentage1m
+    }
+    
+    
+    func setChangePercent1m(_ value: Double){
+        do{
+            try realm!.write(){
+                changePercentage1m = value
+            }
+        }catch{
+            print("error saving: \(error)")
+        }
+    }
+    
+    func getChangePercentage1y() -> Double{
+        return changePercentage1y
+    }
+    
+    
+    func setChangePercent1y(_ value: Double){
+        do{
+            try realm!.write(){
+                changePercentage1y = value
+            }
+        }catch{
+            print("error saving: \(error)")
+        }
+    }
+    
+    
+    
 }

@@ -10,8 +10,9 @@ import UIKit
 
 class NowCell: UITableViewCell {
    
-    @IBOutlet weak var priceInPrefferedCurrencyLabel: UILabel!
-    @IBOutlet weak var priceInPairCurrencyLabel: UILabel!
+    @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var firstLabel: UILabel!
+    @IBOutlet weak var secondLabel: UILabel!
     
    
 

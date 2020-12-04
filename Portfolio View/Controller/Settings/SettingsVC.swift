@@ -11,11 +11,13 @@ import StoreKit
 
 class SettingsVC: UITableViewController, UIPickerViewDelegate, UIPickerViewDataSource{
     var coinHandler: CoinHandler!
-    @IBOutlet weak var currencySettingsLabel: UILabel!
     @IBOutlet weak var sortTypePickerView: UIPickerView!
-    @IBOutlet weak var coloredCellsToggle: UISwitch!
+//    @IBOutlet weak var coloredCellsToggle: UISwitch!
     private let defaults = UserDefaults.standard
-
+    @IBOutlet weak var appearanceSegmentedControl: UISegmentedControl!
+    @IBOutlet weak var selectedCurrencyLabel: UILabel!
+    @IBOutlet weak var selectedSecondaryCurrencyLabel: UILabel!
+    
     override func viewDidLoad() {
         sortTypePickerView.delegate = self
         sortTypePickerView.dataSource = self
@@ -24,12 +26,35 @@ class SettingsVC: UITableViewController, UIPickerViewDelegate, UIPickerViewDataS
     
     override func viewWillAppear(_ animated: Bool) {
         sortTypePickerView.selectRow(coinHandler.sortTypeIds.firstIndex(of: coinHandler.preferredSortType)!, inComponent: 0, animated: false)
-        let coloredCellsEnabled = defaults.bool(forKey: "coloredCells")
-        if coloredCellsEnabled{
-            coloredCellsToggle.isOn = true
-        }else{
-            coloredCellsToggle.isOn = false
+        
+        selectedCurrencyLabel.text = coinHandler.preferredCurrency.uppercased()
+        
+        selectedSecondaryCurrencyLabel.text = coinHandler.secondaryCurrency.uppercased()
+        
+        switch coinHandler.appearance{
+        case "dark":
+            appearanceSegmentedControl.selectedSegmentIndex = 0
+        case "light":
+            appearanceSegmentedControl.selectedSegmentIndex = 1
+        default:
+            appearanceSegmentedControl.selectedSegmentIndex = 2
         }
+        
+        if coinHandler.appearance == "dark"{
+            overrideUserInterfaceStyle = .dark
+        }
+        else if coinHandler.appearance == "light"{
+            overrideUserInterfaceStyle = .light
+        }else{
+            overrideUserInterfaceStyle = .unspecified
+        }
+        
+//        let coloredCellsEnabled = defaults.bool(forKey: "coloredCells")
+//        if coloredCellsEnabled{
+//            coloredCellsToggle.isOn = true
+//        }else{
+//            coloredCellsToggle.isOn = false
+//        }
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -57,17 +82,39 @@ class SettingsVC: UITableViewController, UIPickerViewDelegate, UIPickerViewDataS
                 destinationVC.url = "https://portfolio-view-website.herokuapp.com/support"
             }
         }
-        else if (segue.identifier == "goToAlerts"){
-            let destinationVC = segue.destination as! AlertsVC
-            destinationVC.coinHandler = coinHandler
+       
+    }
+    
+//    @IBAction func coloredCellTogglePressed(_ sender: Any) {
+//        let toggle = sender as! UISwitch
+//        defaults.setValue(toggle.isOn, forKey: "coloredCells")
+//        coinHandler.refresh()
+//    }
+    
+    @IBAction func appearanceToggled(_ sender: UISegmentedControl) {
+        switch sender.selectedSegmentIndex{
+        case 0:
+            coinHandler.appearance = "dark"
+        case 1:
+            coinHandler.appearance = "light"
+        case 2:
+            coinHandler.appearance = "auto"
+        default:
+            coinHandler.appearance = "auto"
+        }
+        if coinHandler.appearance == "dark"{
+            overrideUserInterfaceStyle = .dark
+            self.navigationController?.overrideUserInterfaceStyle = .dark
+        }
+        else if coinHandler.appearance == "light"{
+            overrideUserInterfaceStyle = .light
+            self.navigationController?.overrideUserInterfaceStyle = .light
+        }else{
+            overrideUserInterfaceStyle = .unspecified
+            self.navigationController?.overrideUserInterfaceStyle = .unspecified
         }
     }
     
-    @IBAction func coloredCellTogglePressed(_ sender: Any) {
-        let toggle = sender as! UISwitch
-        defaults.setValue(toggle.isOn, forKey: "coloredCells")
-        coinHandler.refresh()
-    }
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         1
@@ -92,7 +139,7 @@ class SettingsVC: UITableViewController, UIPickerViewDelegate, UIPickerViewDataS
         case 1:
             return 1
         case 2:
-            return 2
+            return 1
         case 3:
             return 5
         default:

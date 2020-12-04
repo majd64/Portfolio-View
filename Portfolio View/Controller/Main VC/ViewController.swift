@@ -20,6 +20,7 @@ class ViewController: UIViewController, ChartViewDelegate, CanRefresh {
     private var coloredCellsEnabled = false
     @IBOutlet weak var background: UIImageView!
     @IBOutlet weak var blur: UIVisualEffectView!
+    @IBOutlet var spinner: UIActivityIndicatorView!
     
     private let coinHandler = CoinHandler()
 
@@ -41,13 +42,29 @@ class ViewController: UIViewController, ChartViewDelegate, CanRefresh {
         coinTableView.refreshControl = myRefreshControl
         self.autoCoinDataRefreshTimer = Timer.scheduledTimer(timeInterval: 21, target: self, selector: #selector(self.requestNewCoinData), userInfo: nil, repeats: true)
         initPieChart()
+        spinner.isHidden = true
+        if !coinHandler.didInit{
+            spinner.isHidden = false
+            spinner.startAnimating()
+        }
         
-        view.window?.overrideUserInterfaceStyle = .dark
-
+        
+          
         super.viewDidLoad()
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        if coinHandler.appearance == "dark"{
+            overrideUserInterfaceStyle = .dark
+            self.navigationController?.overrideUserInterfaceStyle = .dark
+        }
+        else if coinHandler.appearance == "light"{
+            overrideUserInterfaceStyle = .light
+            self.navigationController?.overrideUserInterfaceStyle = .light
+        }else{
+            overrideUserInterfaceStyle = .unspecified
+            self.navigationController?.overrideUserInterfaceStyle = .unspecified
+        }
         coinHandler.delegate = self
     }
     
@@ -116,6 +133,10 @@ class ViewController: UIViewController, ChartViewDelegate, CanRefresh {
             let destinationVC = segue.destination as! PortfolioDetailsVC
             destinationVC.coinHandler = coinHandler
         }
+        else if (segue.identifier == "goToAlerts"){
+            let destinationVC = segue.destination as! AlertsVC
+            destinationVC.coinHandler = coinHandler
+        }
     }
 }
 
@@ -141,16 +162,11 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource{
         cell.iconImage.image = coin.getImage()
         
         if coloredCellsEnabled{
-//            cell.cellView.backgroundColor = coin.getImage()?.averageColor?.withAlphaComponent(0.5) ?? UIColor.gray.withAlphaComponent(0.50)
-            let image = coin.getImage()
-
-            image?.getColors { colors in
-                cell.cellView.backgroundColor = colors?.background
-//              backgroundView.backgroundColor = colors.background
-//              mainLabel.textColor = colors.primary
-//              secondaryLabel.textColor = colors.secondary
-//              detailLabel.textColor = colors.detail
-            }
+            cell.cellView.backgroundColor = coin.getColor()
+//          backgroundView.backgroundColor = colors.background
+//          mainLabel.textColor = colors.primary
+//          secondaryLabel.textColor = colors.secondary
+//          detailLabel.textColor = colors.detail
         }else{
             cell.cellView.backgroundColor = UIColor(named: "Color")
         }
@@ -205,6 +221,10 @@ extension ViewController: CoinHandlerDelegate{
         DispatchQueue.main.asyncAfter(deadline: .now()) {
             self.coinTableView.reloadData()
             self.refreshPieChartData()
+            if self.coinHandler.didInit{
+                self.spinner.stopAnimating()
+                self.spinner.isHidden = true
+            }
         }
     }
     

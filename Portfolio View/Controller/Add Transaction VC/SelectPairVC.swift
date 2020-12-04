@@ -39,6 +39,20 @@ class SelectPairVC: UIViewController, UITableViewDataSource, UITableViewDelegate
         super.viewDidLoad()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        if coinHandler.appearance == "dark"{
+            overrideUserInterfaceStyle = .dark
+            self.navigationController?.overrideUserInterfaceStyle = .dark
+        }
+        else if coinHandler.appearance == "light"{
+            overrideUserInterfaceStyle = .light
+            self.navigationController?.overrideUserInterfaceStyle = .light
+        }else{
+            overrideUserInterfaceStyle = .unspecified
+            self.navigationController?.overrideUserInterfaceStyle = .unspecified
+        }
+    }
+    
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         print("text did change")
         if (isTransfer){
@@ -79,10 +93,10 @@ class SelectPairVC: UIViewController, UITableViewDataSource, UITableViewDelegate
         let cell = UITableViewCell()
         
         if sender is AddBuyTransactionVC || sender is AddSellTransactionVC{
-            cell.textLabel!.text = "\(currencies[indexPath.row].uppercased()) (\(currencies[indexPath.row].uppercased()))"
+            cell.textLabel!.text = "\(currencies[indexPath.row].uppercased())"
         }
         else{
-            cell.textLabel!.text = "\(coins[indexPath.row].getSymbol()) (\(coins[indexPath.row].getName()))"
+            cell.textLabel!.text = "\(coins[indexPath.row].getSymbol().uppercased()) (\(coins[indexPath.row].getName()))"
         }
         cell.accessoryType = .disclosureIndicator
         return cell

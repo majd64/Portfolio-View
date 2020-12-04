@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17126"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="notesCell" rowHeight="86" id="9gr-CB-zmz" customClass="NotesCell" customModule="Portfolio_View" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="414" height="86"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="notesCell" rowHeight="100" id="9gr-CB-zmz" customClass="NotesCell" customModule="Portfolio_View" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="414" height="100"/>
             <autoresizingMask key="autoresizingMask"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="9gr-CB-zmz" id="hap-1c-xbh">
-                <rect key="frame" x="0.0" y="0.0" width="414" height="86"/>
+                <rect key="frame" x="0.0" y="0.0" width="414" height="100"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="AM9-cH-31D">
-                        <rect key="frame" x="10" y="5" width="394" height="76"/>
+                        <rect key="frame" x="10" y="5" width="394" height="90"/>
                         <subviews>
-                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillProportionally" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="TsO-zw-mY7">
-                                <rect key="frame" x="0.0" y="0.0" width="394" height="76"/>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalSpacing" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="TsO-zw-mY7">
+                                <rect key="frame" x="0.0" y="18.5" width="394" height="53.5"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Notes" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CtM-Rn-Dko" userLabel="notes">
-                                        <rect key="frame" x="176.5" y="0.0" width="41" height="35.5"/>
+                                        <rect key="frame" x="176.5" y="0.0" width="41" height="18"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                         <color key="textColor" systemColor="systemGray2Color"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QpN-24-zAo">
-                                        <rect key="frame" x="176.5" y="35.5" width="41.5" height="40.5"/>
+                                        <rect key="frame" x="176.5" y="33" width="41.5" height="20.5"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
@@ -38,6 +38,7 @@
                                 </subviews>
                                 <constraints>
                                     <constraint firstItem="CtM-Rn-Dko" firstAttribute="centerX" secondItem="TsO-zw-mY7" secondAttribute="centerX" id="Yhv-31-2Gq"/>
+                                    <constraint firstItem="QpN-24-zAo" firstAttribute="top" secondItem="CtM-Rn-Dko" secondAttribute="bottom" constant="15" id="oQs-aW-lTn"/>
                                 </constraints>
                             </stackView>
                         </subviews>
@@ -45,8 +46,6 @@
                         <constraints>
                             <constraint firstItem="TsO-zw-mY7" firstAttribute="centerX" secondItem="AM9-cH-31D" secondAttribute="centerX" id="D7g-34-hee"/>
                             <constraint firstAttribute="trailing" secondItem="TsO-zw-mY7" secondAttribute="trailing" id="EtW-fs-ehw"/>
-                            <constraint firstItem="TsO-zw-mY7" firstAttribute="top" secondItem="AM9-cH-31D" secondAttribute="top" id="HSe-6S-CfW"/>
-                            <constraint firstAttribute="bottom" secondItem="TsO-zw-mY7" secondAttribute="bottom" id="Z2L-3t-lsz"/>
                             <constraint firstItem="TsO-zw-mY7" firstAttribute="centerY" secondItem="AM9-cH-31D" secondAttribute="centerY" id="iZR-Tb-dBh"/>
                             <constraint firstItem="TsO-zw-mY7" firstAttribute="leading" secondItem="AM9-cH-31D" secondAttribute="leading" id="xSC-5T-aF7"/>
                         </constraints>
@@ -64,7 +63,7 @@
             <connections>
                 <outlet property="notes" destination="QpN-24-zAo" id="EKy-Ic-de8"/>
             </connections>
-            <point key="canvasLocation" x="244.92753623188409" y="421.875"/>
+            <point key="canvasLocation" x="244.92753623188409" y="426.5625"/>
         </tableViewCell>
     </objects>
     <resources>

@@ -11,6 +11,7 @@ import UIKit
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
+    private let defaults = UserDefaults.standard
 
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
@@ -38,6 +39,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func sceneWillEnterForeground(_ scene: UIScene) {
+        CoinHandler.globalRefresh()
+        session()
         // Called as the scene transitions from the background to the foreground.
         // Use this method to undo the changes made on entering the background.
     }
@@ -48,6 +51,34 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // to restore the scene back to its current state.
     }
 
+    func session(){
+        guard let deviceId = defaults.string(forKey: "deviceId") else{
+            return
+        }
+        let url = URL(string: "\(K.api)/session/\(deviceId)")!
+        var request = URLRequest(url: url)
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        request.httpMethod = "POST"
+        
+        let today = Date()
+        let formatter1 = DateFormatter()
+        formatter1.dateStyle = .full
+        let calendar = Calendar.current
+        let hour = calendar.component(.hour, from: today)
+        let minutes = calendar.component(.minute, from: today)
+        let date = "\(formatter1.string(from: today)). \(hour):\(minutes)"
+    
+        let parameters: [String: Any] = [
+            "deviceToken": defaults.string(forKey: "deviceToken") ?? "",
+            "lastSession": date,
+            "premium": defaults.bool(forKey: "premium"),
+            "preferredCurrency": defaults.string(forKey: "preferredCurrency") ?? "",
+            "volatilityAlerts": defaults.bool(forKey: "volatilityAlertsEnabled") ? 1 : 0
+        ]
+        request.httpBody = parameters.percentEncoded()
 
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in}
+        task.resume()
+    }
 }
 

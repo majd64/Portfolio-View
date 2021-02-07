@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		6613351E6F9FF44AC5705593 /* Pods_Portfolio_View.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00880436CFC744EFB0AA309F /* Pods_Portfolio_View.framework */; };
-		E1001FFB256EED0600046468 /* ExchangeRateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1001FFA256EED0600046468 /* ExchangeRateModel.swift */; };
 		E1029258253F6D7E00CC34AD /* CurrencySettingsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1029257253F6D7E00CC34AD /* CurrencySettingsVC.swift */; };
 		E1091259253F704500DC49F9 /* SettingsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1091258253F704500DC49F9 /* SettingsVC.swift */; };
 		E10FE3E22569FBEE001CC150 /* AlertCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E10FE3E12569FBEE001CC150 /* AlertCell.xib */; };
@@ -23,28 +22,36 @@
 		E135B17125539DB2007F25AB /* NotesCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E135B17025539DB2007F25AB /* NotesCell.xib */; };
 		E135B17425539E5E007F25AB /* NotesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E135B17325539E5E007F25AB /* NotesCell.swift */; };
 		E1384648255CD54C006F7405 /* SupportVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1384647255CD54C006F7405 /* SupportVC.swift */; };
-		E14903D124A53A2200A16EA7 /* CoinModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E14903D024A53A2200A16EA7 /* CoinModel.swift */; };
+		E143980B258EADA90078C699 /* EditEnabledCoinsContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E143980A258EADA90078C699 /* EditEnabledCoinsContainer.swift */; };
 		E14A447E24B643BD0087B04D /* AddSellTransactionVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = E14A447D24B643BD0087B04D /* AddSellTransactionVC.swift */; };
-		E15AE6FC2553A5990029B6F1 /* DeleteCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E15AE6FB2553A5990029B6F1 /* DeleteCell.xib */; };
+		E15AE6FC2553A5990029B6F1 /* ButtonCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E15AE6FB2553A5990029B6F1 /* ButtonCell.xib */; };
 		E15DA3FA24B5677200F7D073 /* AddBuyTransactionVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = E15DA3F924B5677200F7D073 /* AddBuyTransactionVC.swift */; };
 		E1608B2624ABD56A00D36D87 /* CoinVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1608B2524ABD56A00D36D87 /* CoinVC.swift */; };
+		E162329F25ABF75C005939FF /* ButtonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E162329E25ABF75C005939FF /* ButtonCell.swift */; };
 		E163CF4B24BB81DF006CF1F4 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E163CF4A24BB81DF006CF1F4 /* Extensions.swift */; };
 		E16D71D6256C4A7300282EC5 /* K.swift in Sources */ = {isa = PBXBuildFile; fileRef = E16D71D5256C4A7300282EC5 /* K.swift */; };
-		E16D71DC256C7CBF00282EC5 /* ChartModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E16D71DB256C7CBF00282EC5 /* ChartModel.swift */; };
 		E175697524B531A500BD1261 /* TransactionVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = E175697424B531A500BD1261 /* TransactionVC.swift */; };
+		E1905EFE25BA7F1E00C8C239 /* customizeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1905EFD25BA7F1E00C8C239 /* customizeVC.swift */; };
+		E1905F0225BA864600C8C239 /* customVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1905F0125BA864600C8C239 /* customVC.swift */; };
 		E1995AF524A3DFA00009CDA7 /* CoinHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1995AF424A3DFA00009CDA7 /* CoinHandler.swift */; };
 		E19DF2AA24B62D7C002EE247 /* SelectPairVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = E19DF2A924B62D7C002EE247 /* SelectPairVC.swift */; };
 		E1A33A8F24A6BEBF0007B3E2 /* CoinCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A33A8D24A6BEBF0007B3E2 /* CoinCell.swift */; };
 		E1A33A9024A6BEBF0007B3E2 /* CoinCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E1A33A8E24A6BEBF0007B3E2 /* CoinCell.xib */; };
+		E1A3F98025916DF80073DE78 /* CHExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A3F97F25916DF80073DE78 /* CHExtensions.swift */; };
 		E1B3EC55255632F60001873C /* PortfolioPercentageCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E1B3EC54255632F60001873C /* PortfolioPercentageCell.xib */; };
 		E1B3EC582556330A0001873C /* PortfolioPercentageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1B3EC572556330A0001873C /* PortfolioPercentageCell.swift */; };
 		E1B3EC5D255634BB0001873C /* PortfolioDetailsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1B3EC5C255634BB0001873C /* PortfolioDetailsVC.swift */; };
 		E1B510ED24BA291D0002E1A3 /* ContainerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1B510EC24BA291D0002E1A3 /* ContainerVC.swift */; };
-		E1CB9BB8254A545100300916 /* CoinBalanceCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E1CB9BB7254A545100300916 /* CoinBalanceCell.xib */; };
 		E1CB9BBE254A57A300300916 /* CoinBalanceCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1CB9BBD254A57A300300916 /* CoinBalanceCell.swift */; };
 		E1CF34262543D7C100E72AFB /* NowCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E1CF34252543D7C100E72AFB /* NowCell.xib */; };
+		E1D51907258B05400052D4AF /* CoinBalanceCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E1D51906258B05400052D4AF /* CoinBalanceCell.xib */; };
+		E1D5190B258B102E0052D4AF /* AvailbleCoinCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E1D5190A258B102E0052D4AF /* AvailbleCoinCell.xib */; };
+		E1D5190E258B10890052D4AF /* AvailbleCoinCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1D5190D258B10890052D4AF /* AvailbleCoinCell.swift */; };
+		E1D51916258B12480052D4AF /* EditEnabledCoinsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1D51915258B12480052D4AF /* EditEnabledCoinsVC.swift */; };
 		E1E8403B24A47BA50012B347 /* NetoworkHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E8403A24A47BA50012B347 /* NetoworkHandler.swift */; };
-		E1EF152624B788310015436B /* AddTransferTransactionVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1EF152524B788310015436B /* AddTransferTransactionVC.swift */; };
+		E1E9E6C0258D8E6E000D37AA /* models.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E9E6BF258D8E6E000D37AA /* models.swift */; };
+		E1F2AB8E257C6BE7009C8678 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E1F2AB8D257C6BE6009C8678 /* StoreKit.framework */; };
+		E1F2AB95257C71C9009C8678 /* PremiumVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1F2AB94257C71C9009C8678 /* PremiumVC.swift */; };
 		E1FBD26124A2F98900BD83B4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1FBD26024A2F98900BD83B4 /* AppDelegate.swift */; };
 		E1FBD26324A2F98900BD83B4 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1FBD26224A2F98900BD83B4 /* SceneDelegate.swift */; };
 		E1FBD26524A2F98900BD83B4 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1FBD26424A2F98900BD83B4 /* ViewController.swift */; };
@@ -55,11 +62,23 @@
 		E1FBD27A24A2FBD100BD83B4 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1FBD27924A2FBD100BD83B4 /* Transaction.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		E1F9B0362579F7FA007C1CF0 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		00880436CFC744EFB0AA309F /* Pods_Portfolio_View.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Portfolio_View.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		1F36B2683B24E4AA9BE44B7C /* Pods-Portfolio View.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Portfolio View.debug.xcconfig"; path = "Target Support Files/Pods-Portfolio View/Pods-Portfolio View.debug.xcconfig"; sourceTree = "<group>"; };
 		33CCB9E92204098056CD6FF0 /* Pods-Portfolio View.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Portfolio View.release.xcconfig"; path = "Target Support Files/Pods-Portfolio View/Pods-Portfolio View.release.xcconfig"; sourceTree = "<group>"; };
-		E1001FFA256EED0600046468 /* ExchangeRateModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExchangeRateModel.swift; sourceTree = "<group>"; };
 		E1029257253F6D7E00CC34AD /* CurrencySettingsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencySettingsVC.swift; sourceTree = "<group>"; };
 		E1091258253F704500DC49F9 /* SettingsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsVC.swift; sourceTree = "<group>"; };
 		E10FE3E12569FBEE001CC150 /* AlertCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AlertCell.xib; sourceTree = "<group>"; };
@@ -74,29 +93,41 @@
 		E135B17025539DB2007F25AB /* NotesCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NotesCell.xib; sourceTree = "<group>"; };
 		E135B17325539E5E007F25AB /* NotesCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesCell.swift; sourceTree = "<group>"; };
 		E1384647255CD54C006F7405 /* SupportVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SupportVC.swift; path = "Portfolio View/View/SupportVC.swift"; sourceTree = SOURCE_ROOT; };
-		E14903D024A53A2200A16EA7 /* CoinModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinModel.swift; sourceTree = "<group>"; };
+		E143980A258EADA90078C699 /* EditEnabledCoinsContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditEnabledCoinsContainer.swift; sourceTree = "<group>"; };
 		E14A447D24B643BD0087B04D /* AddSellTransactionVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSellTransactionVC.swift; sourceTree = "<group>"; };
-		E15AE6FB2553A5990029B6F1 /* DeleteCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DeleteCell.xib; sourceTree = "<group>"; };
+		E15AE6FB2553A5990029B6F1 /* ButtonCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ButtonCell.xib; sourceTree = "<group>"; };
 		E15DA3F924B5677200F7D073 /* AddBuyTransactionVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBuyTransactionVC.swift; sourceTree = "<group>"; };
 		E1608B2524ABD56A00D36D87 /* CoinVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinVC.swift; sourceTree = "<group>"; };
+		E162329E25ABF75C005939FF /* ButtonCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonCell.swift; sourceTree = "<group>"; };
 		E163CF4A24BB81DF006CF1F4 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		E16D71D5256C4A7300282EC5 /* K.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = K.swift; sourceTree = "<group>"; };
-		E16D71DB256C7CBF00282EC5 /* ChartModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartModel.swift; sourceTree = "<group>"; };
 		E175697424B531A500BD1261 /* TransactionVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionVC.swift; sourceTree = "<group>"; };
+		E1905EFD25BA7F1E00C8C239 /* customizeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = customizeVC.swift; sourceTree = "<group>"; };
+		E1905F0125BA864600C8C239 /* customVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = customVC.swift; sourceTree = "<group>"; };
 		E1995AF424A3DFA00009CDA7 /* CoinHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinHandler.swift; sourceTree = "<group>"; };
+		E19D1EF92593B4B20020E127 /* Portfolio View WidgetsExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Portfolio View WidgetsExtension.entitlements"; sourceTree = "<group>"; };
 		E19DF2A924B62D7C002EE247 /* SelectPairVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectPairVC.swift; sourceTree = "<group>"; };
 		E1A33A8D24A6BEBF0007B3E2 /* CoinCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinCell.swift; sourceTree = "<group>"; };
 		E1A33A8E24A6BEBF0007B3E2 /* CoinCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CoinCell.xib; sourceTree = "<group>"; };
+		E1A3F97F25916DF80073DE78 /* CHExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CHExtensions.swift; sourceTree = "<group>"; };
 		E1B3EC54255632F60001873C /* PortfolioPercentageCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PortfolioPercentageCell.xib; sourceTree = "<group>"; };
 		E1B3EC572556330A0001873C /* PortfolioPercentageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioPercentageCell.swift; sourceTree = "<group>"; };
 		E1B3EC5C255634BB0001873C /* PortfolioDetailsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioDetailsVC.swift; sourceTree = "<group>"; };
 		E1B510EC24BA291D0002E1A3 /* ContainerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerVC.swift; sourceTree = "<group>"; };
-		E1CB9BB7254A545100300916 /* CoinBalanceCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = CoinBalanceCell.xib; path = "../New Group/CoinBalanceCell.xib"; sourceTree = "<group>"; };
 		E1CB9BBD254A57A300300916 /* CoinBalanceCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinBalanceCell.swift; sourceTree = "<group>"; };
 		E1CF34252543D7C100E72AFB /* NowCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NowCell.xib; sourceTree = "<group>"; };
+		E1D51906258B05400052D4AF /* CoinBalanceCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CoinBalanceCell.xib; sourceTree = "<group>"; };
+		E1D5190A258B102E0052D4AF /* AvailbleCoinCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AvailbleCoinCell.xib; sourceTree = "<group>"; };
+		E1D5190D258B10890052D4AF /* AvailbleCoinCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvailbleCoinCell.swift; sourceTree = "<group>"; };
+		E1D51915258B12480052D4AF /* EditEnabledCoinsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditEnabledCoinsVC.swift; sourceTree = "<group>"; };
 		E1E8403A24A47BA50012B347 /* NetoworkHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetoworkHandler.swift; sourceTree = "<group>"; };
+		E1E9E6BF258D8E6E000D37AA /* models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = models.swift; sourceTree = "<group>"; };
 		E1EEBAB3255FB61600759CE0 /* Portfolio View.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Portfolio View.entitlements"; sourceTree = "<group>"; };
-		E1EF152524B788310015436B /* AddTransferTransactionVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTransferTransactionVC.swift; sourceTree = "<group>"; };
+		E1F2AB8D257C6BE6009C8678 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		E1F2AB94257C71C9009C8678 /* PremiumVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumVC.swift; sourceTree = "<group>"; };
+		E1F9B0222579F7F5007C1CF0 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		E1F9B0242579F7F5007C1CF0 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		E1F9B0322579F7FA007C1CF0 /* portfolioViewWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = portfolioViewWidgetExtension.entitlements; sourceTree = "<group>"; };
 		E1FBD25D24A2F98900BD83B4 /* Portfolio View.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Portfolio View.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1FBD26024A2F98900BD83B4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E1FBD26224A2F98900BD83B4 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -115,6 +146,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6613351E6F9FF44AC5705593 /* Pods_Portfolio_View.framework in Frameworks */,
+				E1F2AB8E257C6BE7009C8678 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -124,7 +156,10 @@
 		3F515CB4B53083B7C06B7D93 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				E1F2AB8D257C6BE6009C8678 /* StoreKit.framework */,
 				00880436CFC744EFB0AA309F /* Pods_Portfolio_View.framework */,
+				E1F9B0222579F7F5007C1CF0 /* WidgetKit.framework */,
+				E1F9B0242579F7F5007C1CF0 /* SwiftUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -144,6 +179,9 @@
 				E1091258253F704500DC49F9 /* SettingsVC.swift */,
 				E1029257253F6D7E00CC34AD /* CurrencySettingsVC.swift */,
 				E1384647255CD54C006F7405 /* SupportVC.swift */,
+				E1F2AB94257C71C9009C8678 /* PremiumVC.swift */,
+				E1D51915258B12480052D4AF /* EditEnabledCoinsVC.swift */,
+				E143980A258EADA90078C699 /* EditEnabledCoinsContainer.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -165,19 +203,10 @@
 				E1CF34252543D7C100E72AFB /* NowCell.xib */,
 				E135B17025539DB2007F25AB /* NotesCell.xib */,
 				E135B17325539E5E007F25AB /* NotesCell.swift */,
-				E15AE6FB2553A5990029B6F1 /* DeleteCell.xib */,
+				E15AE6FB2553A5990029B6F1 /* ButtonCell.xib */,
+				E162329E25ABF75C005939FF /* ButtonCell.swift */,
 			);
 			path = "Transaction Detail Cells";
-			sourceTree = "<group>";
-		};
-		E14903D224A53ACC00A16EA7 /* JSON Models */ = {
-			isa = PBXGroup;
-			children = (
-				E14903D024A53A2200A16EA7 /* CoinModel.swift */,
-				E16D71DB256C7CBF00282EC5 /* ChartModel.swift */,
-				E1001FFA256EED0600046468 /* ExchangeRateModel.swift */,
-			);
-			path = "JSON Models";
 			sourceTree = "<group>";
 		};
 		E14903D324A55B1F00A16EA7 /* Realm Objects */ = {
@@ -185,6 +214,7 @@
 			children = (
 				E1FBD27724A2FA2200BD83B4 /* Coin.swift */,
 				E1FBD27924A2FBD100BD83B4 /* Transaction.swift */,
+				E1E9E6BF258D8E6E000D37AA /* models.swift */,
 			);
 			path = "Realm Objects";
 			sourceTree = "<group>";
@@ -213,10 +243,18 @@
 				E175697424B531A500BD1261 /* TransactionVC.swift */,
 				E15DA3F924B5677200F7D073 /* AddBuyTransactionVC.swift */,
 				E14A447D24B643BD0087B04D /* AddSellTransactionVC.swift */,
-				E1EF152524B788310015436B /* AddTransferTransactionVC.swift */,
 				E19DF2A924B62D7C002EE247 /* SelectPairVC.swift */,
 			);
 			path = "Add Transaction VC";
+			sourceTree = "<group>";
+		};
+		E1905F0025BA862900C8C239 /* Customization */ = {
+			isa = PBXGroup;
+			children = (
+				E1905EFD25BA7F1E00C8C239 /* customizeVC.swift */,
+				E1905F0125BA864600C8C239 /* customVC.swift */,
+			);
+			path = Customization;
 			sourceTree = "<group>";
 		};
 		E1B3EC53255632D00001873C /* Portfolio Percentage Cell */ = {
@@ -231,8 +269,8 @@
 		E1CB9BBC254A578800300916 /* Balance Cell */ = {
 			isa = PBXGroup;
 			children = (
-				E1CB9BB7254A545100300916 /* CoinBalanceCell.xib */,
 				E1CB9BBD254A57A300300916 /* CoinBalanceCell.swift */,
+				E1D51906258B05400052D4AF /* CoinBalanceCell.xib */,
 			);
 			path = "Balance Cell";
 			sourceTree = "<group>";
@@ -266,6 +304,8 @@
 		E1FBD25424A2F98900BD83B4 = {
 			isa = PBXGroup;
 			children = (
+				E19D1EF92593B4B20020E127 /* Portfolio View WidgetsExtension.entitlements */,
+				E1F9B0322579F7FA007C1CF0 /* portfolioViewWidgetExtension.entitlements */,
 				E1FBD25F24A2F98900BD83B4 /* Portfolio View */,
 				E1FBD25E24A2F98900BD83B4 /* Products */,
 				5DCD943B978245B95F4A6218 /* Pods */,
@@ -299,9 +339,9 @@
 		E1FBD27424A2F9AE00BD83B4 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				E14903D224A53ACC00A16EA7 /* JSON Models */,
 				E14903D324A55B1F00A16EA7 /* Realm Objects */,
 				E1995AF424A3DFA00009CDA7 /* CoinHandler.swift */,
+				E1A3F97F25916DF80073DE78 /* CHExtensions.swift */,
 				E1E8403A24A47BA50012B347 /* NetoworkHandler.swift */,
 			);
 			path = Model;
@@ -310,8 +350,8 @@
 		E1FBD27524A2F9B400BD83B4 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				E1B3EC53255632D00001873C /* Portfolio Percentage Cell */,
 				E1CB9BBC254A578800300916 /* Balance Cell */,
+				E1B3EC53255632D00001873C /* Portfolio Percentage Cell */,
 				E1CF342A2543DA7D00E72AFB /* Transaction Cell */,
 				E1CF34292543DA7000E72AFB /* Coin Cell */,
 				E116D20F2543A16900506CF0 /* Transaction Detail Cells */,
@@ -319,6 +359,8 @@
 				E1FBD26B24A2F99000BD83B4 /* LaunchScreen.storyboard */,
 				E10FE3E12569FBEE001CC150 /* AlertCell.xib */,
 				E10FE3F02569FFCE001CC150 /* AlertCell.swift */,
+				E1D5190A258B102E0052D4AF /* AvailbleCoinCell.xib */,
+				E1D5190D258B10890052D4AF /* AvailbleCoinCell.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -326,6 +368,7 @@
 		E1FBD27624A2F9B800BD83B4 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				E1905F0025BA862900C8C239 /* Customization */,
 				E10FE3E42569FDFE001CC150 /* Alerts */,
 				E1FBD26024A2F98900BD83B4 /* AppDelegate.swift */,
 				E1FBD26224A2F98900BD83B4 /* SceneDelegate.swift */,
@@ -350,6 +393,7 @@
 				E1FBD25A24A2F98900BD83B4 /* Frameworks */,
 				E1FBD25B24A2F98900BD83B4 /* Resources */,
 				8D70B856C77EAE73E579ABAC /* [CP] Embed Pods Frameworks */,
+				E1F9B0362579F7FA007C1CF0 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
@@ -366,7 +410,7 @@
 		E1FBD25524A2F98900BD83B4 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1150;
+				LastSwiftUpdateCheck = 1230;
 				LastUpgradeCheck = 1200;
 				ORGANIZATIONNAME = "Majd Hailat";
 				TargetAttributes = {
@@ -399,13 +443,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				E1CF34262543D7C100E72AFB /* NowCell.xib in Resources */,
-				E15AE6FC2553A5990029B6F1 /* DeleteCell.xib in Resources */,
+				E15AE6FC2553A5990029B6F1 /* ButtonCell.xib in Resources */,
 				E10FE3E22569FBEE001CC150 /* AlertCell.xib in Resources */,
 				E1FBD26D24A2F99000BD83B4 /* LaunchScreen.storyboard in Resources */,
 				E1FBD26A24A2F99000BD83B4 /* Assets.xcassets in Resources */,
-				E1CB9BB8254A545100300916 /* CoinBalanceCell.xib in Resources */,
 				E1A33A9024A6BEBF0007B3E2 /* CoinCell.xib in Resources */,
+				E1D5190B258B102E0052D4AF /* AvailbleCoinCell.xib in Resources */,
 				E1B3EC55255632F60001873C /* PortfolioPercentageCell.xib in Resources */,
+				E1D51907258B05400052D4AF /* CoinBalanceCell.xib in Resources */,
 				E135B17125539DB2007F25AB /* NotesCell.xib in Resources */,
 				E1FBD26824A2F98900BD83B4 /* Main.storyboard in Resources */,
 				E124E3CF253E55070015BB08 /* TransactionCell.xib in Resources */,
@@ -461,7 +506,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E14903D124A53A2200A16EA7 /* CoinModel.swift in Sources */,
+				E1E9E6C0258D8E6E000D37AA /* models.swift in Sources */,
 				E1FBD26524A2F98900BD83B4 /* ViewController.swift in Sources */,
 				E116D2112543A5D400506CF0 /* NowCell.swift in Sources */,
 				E163CF4B24BB81DF006CF1F4 /* Extensions.swift in Sources */,
@@ -475,24 +520,29 @@
 				E1B510ED24BA291D0002E1A3 /* ContainerVC.swift in Sources */,
 				E16D71D6256C4A7300282EC5 /* K.swift in Sources */,
 				E1995AF524A3DFA00009CDA7 /* CoinHandler.swift in Sources */,
+				E143980B258EADA90078C699 /* EditEnabledCoinsContainer.swift in Sources */,
 				E14A447E24B643BD0087B04D /* AddSellTransactionVC.swift in Sources */,
 				E124E3CD253E54BA0015BB08 /* TransactionCell.swift in Sources */,
+				E1A3F98025916DF80073DE78 /* CHExtensions.swift in Sources */,
 				E10FE3EC2569FE52001CC150 /* AddAlertVC.swift in Sources */,
+				E162329F25ABF75C005939FF /* ButtonCell.swift in Sources */,
 				E15DA3FA24B5677200F7D073 /* AddBuyTransactionVC.swift in Sources */,
+				E1905F0225BA864600C8C239 /* customVC.swift in Sources */,
+				E1D51916258B12480052D4AF /* EditEnabledCoinsVC.swift in Sources */,
+				E1905EFE25BA7F1E00C8C239 /* customizeVC.swift in Sources */,
 				E10FE3F12569FFCE001CC150 /* AlertCell.swift in Sources */,
 				E1B3EC5D255634BB0001873C /* PortfolioDetailsVC.swift in Sources */,
 				E135B17425539E5E007F25AB /* NotesCell.swift in Sources */,
+				E1F2AB95257C71C9009C8678 /* PremiumVC.swift in Sources */,
 				E19DF2AA24B62D7C002EE247 /* SelectPairVC.swift in Sources */,
 				E1608B2624ABD56A00D36D87 /* CoinVC.swift in Sources */,
-				E16D71DC256C7CBF00282EC5 /* ChartModel.swift in Sources */,
+				E1D5190E258B10890052D4AF /* AvailbleCoinCell.swift in Sources */,
 				E1FBD26324A2F98900BD83B4 /* SceneDelegate.swift in Sources */,
 				E1FBD27A24A2FBD100BD83B4 /* Transaction.swift in Sources */,
 				E1384648255CD54C006F7405 /* SupportVC.swift in Sources */,
 				E10FE3E62569FE20001CC150 /* AlertsVC.swift in Sources */,
-				E1EF152624B788310015436B /* AddTransferTransactionVC.swift in Sources */,
 				E175697524B531A500BD1261 /* TransactionVC.swift in Sources */,
 				E1A33A8F24A6BEBF0007B3E2 /* CoinCell.swift in Sources */,
-				E1001FFB256EED0600046468 /* ExchangeRateModel.swift in Sources */,
 				E1E8403B24A47BA50012B347 /* NetoworkHandler.swift in Sources */,
 				E1029258253F6D7E00CC34AD /* CurrencySettingsVC.swift in Sources */,
 			);
@@ -553,6 +603,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -614,6 +665,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -640,10 +692,13 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 1F36B2683B24E4AA9BE44B7C /* Pods-Portfolio View.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "Portfolio View/Portfolio View.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 23;
 				DEVELOPMENT_TEAM = YVWM9D9TSW;
 				GCC_NO_COMMON_BLOCKS = NO;
 				INFOPLIST_FILE = "Portfolio View/Info.plist";
@@ -651,8 +706,11 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 5.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.porfolioview.portfolioview;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SUPPORTS_MACCATALYST = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -663,10 +721,13 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33CCB9E92204098056CD6FF0 /* Pods-Portfolio View.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "Portfolio View/Portfolio View.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 23;
 				DEVELOPMENT_TEAM = YVWM9D9TSW;
 				GCC_NO_COMMON_BLOCKS = NO;
 				INFOPLIST_FILE = "Portfolio View/Info.plist";
@@ -674,8 +735,11 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 5.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.porfolioview.portfolioview;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SUPPORTS_MACCATALYST = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

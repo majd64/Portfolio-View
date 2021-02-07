@@ -9,8 +9,5 @@
 import UIKit
 
 class NotesCell: UITableViewCell {
-
-    
     @IBOutlet weak var notes: UILabel!
-    
 }

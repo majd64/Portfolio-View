@@ -14,27 +14,32 @@ class TransactionVC: UIViewController {
     
     @IBOutlet weak var addBuyTransactionView: UIView!
     @IBOutlet weak var addSellTransactionView: UIView!
-    @IBOutlet weak var addTransferTransactionView: UIView!
+    @IBOutlet var segmentedControl: UISegmentedControl!
+    
+    var isEditingTransaction = false
+    var transaction: Transaction?
     
     override func viewDidLoad() {
         addBuyTransactionView.alpha = 1
         addSellTransactionView.alpha = 0
-        addTransferTransactionView.alpha = 0
+        
+        self.title = "Add Transaction"
+
+        if (isEditingTransaction){
+            self.title = "Edit Transaction"
+
+            segmentedControl.isEnabled = false
+            if (transaction?.getTransactionType() == Transaction.typeBought || transaction?.getTransactionType() == Transaction.typeReceived){
+                addBuyTransactionView.alpha = 1
+                addSellTransactionView.alpha = 0
+                segmentedControl.selectedSegmentIndex = 0
+            }else{
+                addBuyTransactionView.alpha = 0
+                addSellTransactionView.alpha = 1
+                segmentedControl.selectedSegmentIndex = 1
+            }
+        }
         super.viewDidLoad()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        if coinHandler.appearance == "dark"{
-            overrideUserInterfaceStyle = .dark
-            self.navigationController?.overrideUserInterfaceStyle = .dark
-        }
-        else if coinHandler.appearance == "light"{
-            overrideUserInterfaceStyle = .light
-            self.navigationController?.overrideUserInterfaceStyle = .light
-        }else{
-            overrideUserInterfaceStyle = .unspecified
-            self.navigationController?.overrideUserInterfaceStyle = .unspecified
-        }
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -42,16 +47,15 @@ class TransactionVC: UIViewController {
             let dest = segue.destination as! AddBuyTransactionVC
             dest.coin = coin
             dest.coinHandler = coinHandler
+            dest.isEditingTransaction = isEditingTransaction
+            dest.transaction = isEditingTransaction ? transaction : nil
         }
         else if segue.identifier == "goToAddSellTransactionVC"{
             let dest = segue.destination as! AddSellTransactionVC
             dest.coin = coin
             dest.coinHandler = coinHandler
-        }
-        else if segue.identifier == "goToAddTransferTransactionVC"{
-            let dest = segue.destination as! AddTransferTransactionVC
-            dest.coin = coin
-            dest.coinHandler = coinHandler
+            dest.isEditingTransaction = isEditingTransaction
+            dest.transaction = isEditingTransaction ? transaction : nil
         }
     }
     
@@ -61,15 +65,12 @@ class TransactionVC: UIViewController {
         case 0:
             addBuyTransactionView.alpha = 1
             addSellTransactionView.alpha = 0
-            addTransferTransactionView.alpha = 0
         case 1:
             addBuyTransactionView.alpha = 0
             addSellTransactionView.alpha = 1
-            addTransferTransactionView.alpha = 0
         default:
-            addBuyTransactionView.alpha = 0
+            addBuyTransactionView.alpha = 1
             addSellTransactionView.alpha = 0
-            addTransferTransactionView.alpha = 1
         }
     }
 }

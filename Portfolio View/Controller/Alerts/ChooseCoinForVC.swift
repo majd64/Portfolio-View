@@ -8,10 +8,14 @@
 
 import UIKit
 
-class ChooseCoinForAlertVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate {
+class ChooseCoinForAlertVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate, AlertAdded {
+    func alertAdded() {
+        _ = navigationController?.popViewController(animated: true)
+    }
+    
     var coinHandler: CoinHandler!
     var coins: [Coin] = []
-        
+    
     @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var tableView: UITableView!
     override func viewDidLoad() {
@@ -23,20 +27,6 @@ class ChooseCoinForAlertVC: UIViewController, UITableViewDelegate, UITableViewDa
         super.viewDidLoad()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        if coinHandler.appearance == "dark"{
-            overrideUserInterfaceStyle = .dark
-            self.navigationController?.overrideUserInterfaceStyle = .dark
-        }
-        else if coinHandler.appearance == "light"{
-            overrideUserInterfaceStyle = .light
-            self.navigationController?.overrideUserInterfaceStyle = .light
-        }else{
-            overrideUserInterfaceStyle = .unspecified
-            self.navigationController?.overrideUserInterfaceStyle = .unspecified
-        }
-    }
-    
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         coins = coinHandler.getCoins().filter({$0.getSymbol().lowercased() .prefix(searchText.count) == searchText.lowercased() || $0.getName().lowercased() .prefix(searchText.count) == searchText.lowercased()})
         tableView.reloadData()
@@ -44,7 +34,7 @@ class ChooseCoinForAlertVC: UIViewController, UITableViewDelegate, UITableViewDa
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchBar.text = ""
-            coins = coinHandler.getCoins()
+        coins = coinHandler.getCoins()
        
         tableView.reloadData()
         searchBar.resignFirstResponder()
@@ -74,6 +64,7 @@ class ChooseCoinForAlertVC: UIViewController, UITableViewDelegate, UITableViewDa
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "goToAddAlert"{
             let destinationVC = segue.destination as! AddAlertVC
+            destinationVC.delegate = self
             destinationVC.coin = coins[sender as! Int]
             destinationVC.coinHandler = coinHandler
         }

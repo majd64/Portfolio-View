@@ -9,17 +9,15 @@
 import Foundation
 import UIKit
 
-
 struct K{
-    static let api = "https://www.portfolioview.ca"
-   static func convertCommasToDots(_ input: String) -> String {
+    static let api = "https://www.portfolioview.ca/api"
+    static func convertCommasToDots(_ input: String) -> String {
         return String(input.map {
-            $0 == "," ? "." : $0
+        $0 == "," ? "." : $0
         })
     }
     
-    //_ input: Double, symbol: String
-    static func convertToMoneyFormat(_ input: Double, currency: String) -> String{
+    static func convertToMoney(_ input: Double, currency: String) -> String{
         let numberFormatter = NumberFormatter()
         numberFormatter.numberStyle = .decimal
         numberFormatter.minimumFractionDigits = 2
@@ -31,14 +29,13 @@ struct K{
     static func convertToCoinPrice(_ input: Double, currency: String) -> String{
         let numberFormatter = NumberFormatter()
         numberFormatter.numberStyle = .decimal
+        numberFormatter.minimumFractionDigits = 2
         if input < 1{
-            numberFormatter.minimumFractionDigits = 2
             numberFormatter.maximumFractionDigits = 6
             numberFormatter.minimumSignificantDigits = 3
             numberFormatter.maximumSignificantDigits = 3
             numberFormatter.roundingMode = .halfUp
         }else{
-            numberFormatter.minimumFractionDigits = 2
             numberFormatter.maximumFractionDigits = 2
         }
         let formattedPrice = "\(K.getCurrencySymbol(currency: currency))\(numberFormatter.string(from: NSNumber(value: input)) ?? "0.00")"
@@ -53,6 +50,29 @@ struct K{
         }
         return ""
     }
+    
+    static func hexStringToUIColor (hex:String) -> UIColor {
+        var cString:String = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+
+        if (cString.hasPrefix("#")) {
+            cString.remove(at: cString.startIndex)
+        }
+
+        if ((cString.count) != 6) {
+            return UIColor.gray
+        }
+
+        var rgbValue:UInt64 = 0
+        Scanner(string: cString).scanHexInt64(&rgbValue)
+
+        return UIColor(
+            red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
+            green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
+            blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
+            alpha: CGFloat(1.0)
+        )
+    }
+
     
     static func getCurrencyName(currency: String) -> String{
         for i in currencies{
@@ -71,6 +91,54 @@ struct K{
         }
         return ""
     }
+    
+    static func getCurrencyFromCurrencyID(currencyID: String) -> String{
+        for i in currencies{
+            if i[3].lowercased() == currencyID.lowercased(){
+                return i[0].lowercased()
+            }
+        }
+        return "usd"
+    }
+    
+    static func hexStringFromColor(color: UIColor) -> String {
+       let components = color.cgColor.components
+       let r: CGFloat = components?[0] ?? 0.0
+       let g: CGFloat = components?[1] ?? 0.0
+       let b: CGFloat = components?[2] ?? 0.0
+
+       let hexString = String.init(format: "#%02lX%02lX%02lX", lroundf(Float(r * 255)), lroundf(Float(g * 255)), lroundf(Float(b * 255)))
+       return hexString
+    }
+
+   static func colorWithHexString(hexString: String) -> UIColor {
+       var colorString = hexString.trimmingCharacters(in: .whitespacesAndNewlines)
+       colorString = colorString.replacingOccurrences(of: "#", with: "").uppercased()
+
+       let alpha: CGFloat = 1.0
+       let red: CGFloat = colorComponentFrom(colorString: colorString, start: 0, length: 2)
+       let green: CGFloat = colorComponentFrom(colorString: colorString, start: 2, length: 2)
+       let blue: CGFloat = colorComponentFrom(colorString: colorString, start: 4, length: 2)
+
+       let color = UIColor(red: red, green: green, blue: blue, alpha: alpha)
+       return color
+   }
+
+    static func colorComponentFrom(colorString: String, start: Int, length: Int) -> CGFloat {
+
+       let startIndex = colorString.index(colorString.startIndex, offsetBy: start)
+       let endIndex = colorString.index(startIndex, offsetBy: length)
+       let subString = colorString[startIndex..<endIndex]
+       let fullHexString = length == 2 ? subString : "\(subString)\(subString)"
+       var hexComponent: UInt32 = 0
+
+       guard Scanner(string: String(fullHexString)).scanHexInt32(&hexComponent) else {
+           return 0
+       }
+       let hexFloat: CGFloat = CGFloat(hexComponent)
+       let floatValue: CGFloat = CGFloat(hexFloat / 255.0)
+       return floatValue
+   }
     
     static let currencies = [
         [ "BDT", "Tk", "Bangladeshi taka", "bangladeshi-taka" ],
@@ -306,51 +374,6 @@ struct K{
           ],
           [ "BTN", "", "Bhutanese ngultrum", "bhutanese-ngultrum" ]
     ]
-    
-    
-    static func hexStringFromColor(color: UIColor) -> String {
-       let components = color.cgColor.components
-       let r: CGFloat = components?[0] ?? 0.0
-       let g: CGFloat = components?[1] ?? 0.0
-       let b: CGFloat = components?[2] ?? 0.0
-
-       let hexString = String.init(format: "#%02lX%02lX%02lX", lroundf(Float(r * 255)), lroundf(Float(g * 255)), lroundf(Float(b * 255)))
-       return hexString
-    }
-
-   static func colorWithHexString(hexString: String) -> UIColor {
-       var colorString = hexString.trimmingCharacters(in: .whitespacesAndNewlines)
-       colorString = colorString.replacingOccurrences(of: "#", with: "").uppercased()
-
-       print(colorString)
-       let alpha: CGFloat = 1.0
-       let red: CGFloat = colorComponentFrom(colorString: colorString, start: 0, length: 2)
-       let green: CGFloat = colorComponentFrom(colorString: colorString, start: 2, length: 2)
-       let blue: CGFloat = colorComponentFrom(colorString: colorString, start: 4, length: 2)
-
-       let color = UIColor(red: red, green: green, blue: blue, alpha: alpha)
-       return color
-   }
-
-    static func colorComponentFrom(colorString: String, start: Int, length: Int) -> CGFloat {
-
-       let startIndex = colorString.index(colorString.startIndex, offsetBy: start)
-       let endIndex = colorString.index(startIndex, offsetBy: length)
-       let subString = colorString[startIndex..<endIndex]
-       let fullHexString = length == 2 ? subString : "\(subString)\(subString)"
-       var hexComponent: UInt32 = 0
-
-       guard Scanner(string: String(fullHexString)).scanHexInt32(&hexComponent) else {
-           return 0
-       }
-       let hexFloat: CGFloat = CGFloat(hexComponent)
-       let floatValue: CGFloat = CGFloat(hexFloat / 255.0)
-       print(floatValue)
-       return floatValue
-   }
-
-
- 
 }
 
 

@@ -10,6 +10,10 @@ import UIKit
 import Charts
 
 class ContainerVC: UIViewController, CoinHandlerDelegate, ChartViewDelegate{
+    func requestRefresh() {
+        coinHandler.fetchCoinData(lightRefresh: false)
+    }
+    
     var coin: Coin!
     var coinHandler: CoinHandler!
     
@@ -20,6 +24,8 @@ class ContainerVC: UIViewController, CoinHandlerDelegate, ChartViewDelegate{
     @IBOutlet weak var balanceLabel: UILabel!
     @IBOutlet weak var balanceValueLabel: UILabel!
     @IBOutlet weak var h24ChangeLabel: UILabel!
+    @IBOutlet weak var highLabel: UILabel!
+    @IBOutlet weak var lowLabel: UILabel!
     @IBOutlet weak var segmentedControl: UISegmentedControl!
     @IBOutlet weak var pinnedButton: UIButton!
     
@@ -29,34 +35,34 @@ class ContainerVC: UIViewController, CoinHandlerDelegate, ChartViewDelegate{
     let generator = UIImpactFeedbackGenerator(style: .light)
                 
     
-    private var lineChartDataSets: [(timeFrame: String, data: LineChartData?, change: String)] = [
-        (timeFrame: "1D", data: nil, change: ""),
-        (timeFrame: "1W", data: nil, change: ""),
-        (timeFrame: "1M", data: nil, change: ""),
-        (timeFrame: "3M", data: nil, change: ""),
-        (timeFrame: "6M", data: nil, change: ""),
-        (timeFrame: "1Y", data: nil, change: ""),
-        (timeFrame: "MAX", data: nil, change: "")]
+    private var lineChartDataSets: [(timeFrame: String, data: LineChartData?, change: Double, high: Double, low: Double)] = [
+        (timeFrame: "1D", data: nil, change: 0, high: 0, low: 0),
+        (timeFrame: "1W", data: nil, change: 0, high: 0, low: 0),
+        (timeFrame: "1M", data: nil, change: 0, high: 0, low: 0),
+        (timeFrame: "3M", data: nil, change: 0, high: 0, low: 0),
+        (timeFrame: "6M", data: nil, change: 0, high: 0, low: 0),
+        (timeFrame: "1Y", data: nil, change: 0, high: 0, low: 0),
+        (timeFrame: "MAX", data: nil, change: 0, high: 0, low: 0)]
     
     private let symbolConfig = UIImage.SymbolConfiguration(scale: .large)
         
     override func viewDidLoad() {
         lineChartDataSets = [
-            (timeFrame: "1D", data: nil, change: ""),
-            (timeFrame: "1W", data: nil, change: ""),
-            (timeFrame: "1M", data: nil, change: ""),
-            (timeFrame: "3M", data: nil, change: ""),
-            (timeFrame: "6M", data: nil, change: ""),
-            (timeFrame: "1Y", data: nil, change: ""),
-            (timeFrame: "MAX", data: nil, change: "")]
-        refresh()
-        coinHandler.delegate = self
+            (timeFrame: "1D", data: nil, change: 0, high: 0, low: 0),
+            (timeFrame: "1W", data: nil, change: 0, high: 0, low: 0),
+            (timeFrame: "1M", data: nil, change: 0, high: 0, low: 0),
+            (timeFrame: "3M", data: nil, change: 0, high: 0, low: 0),
+            (timeFrame: "6M", data: nil, change: 0, high: 0, low: 0),
+            (timeFrame: "1Y", data: nil, change: 0, high: 0, low: 0),
+            (timeFrame: "MAX", data: nil, change: 0, high: 0, low: 0)]
+        coinHandler.secondaryDelegate = self
         coinHandler.lineChartDelegate = self
         lineChart.delegate = self
-        segmentedControl.selectedSegmentIndex = 0
+        segmentedControl.selectedSegmentIndex = selectedTimeFrameIndex
         initLineChart()
         iconImage.image = coin.getImage()
         symbolLabel.text = coin.getSymbol().uppercased()
+        priceLabel.text = K.convertToCoinPrice(coin.getPrice(), currency: coinHandler.preferredCurrency)
         
         if (coin.getPinned()){
             pinnedButton.setImage(UIImage(systemName: "star.fill", withConfiguration: symbolConfig), for: .normal)
@@ -64,29 +70,12 @@ class ContainerVC: UIViewController, CoinHandlerDelegate, ChartViewDelegate{
             pinnedButton.setImage(UIImage(systemName: "star", withConfiguration: symbolConfig), for: .normal)
         }
         
-        for i in 0..<lineChartDataSets.count{
-            coinHandler.fetchChartData(id: coin.getID(), timeFrame: lineChartDataSets[i].timeFrame)
-        }
+        coinHandler.fetchChartData(id: coin.getID(), timeFrame: lineChartDataSets[selectedTimeFrameIndex].timeFrame)
         super.viewDidLoad()
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        coinHandler.delegate = self
-        if coinHandler.appearance == "dark"{
-            overrideUserInterfaceStyle = .dark
-            self.navigationController?.overrideUserInterfaceStyle = .dark
-        }
-        else if coinHandler.appearance == "light"{
-            overrideUserInterfaceStyle = .light
-            self.navigationController?.overrideUserInterfaceStyle = .light
-        }else{
-            overrideUserInterfaceStyle = .unspecified
-            self.navigationController?.overrideUserInterfaceStyle = .unspecified
-        }
-    }
-    
-    func didUpdateCoinsData() {
-        refresh()
+        coinHandler.secondaryDelegate = self
     }
     
     func didUpdateCurrencyData() {}
@@ -95,9 +84,26 @@ class ContainerVC: UIViewController, CoinHandlerDelegate, ChartViewDelegate{
         print(error)
     }
     
+    @IBAction func addAlertPressed(_ sender: Any) {
+        performSegue(withIdentifier: "goToAlerts", sender: coin)
+    }
     
-    @objc internal func refresh(){
-        priceLabel.text = K.convertToCoinPrice(coin.getPrice(), currency: coinHandler.preferredCurrency)
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if (segue.identifier == "goToAlerts"){
+            let destVC = segue.destination as! AlertsVC
+            destVC.coinHandler = coinHandler
+            destVC.shouldGoStraighToAddAlertVC = true
+            destVC.coinToAddAlertFor = coin
+            
+            
+        }
+    }
+    
+    @objc internal func refresh(sender: String){
+        if (!coin.isInvalidated){
+            priceLabel.text = K.convertToCoinPrice(coin.getPrice(), currency: coinHandler.preferredCurrency)
+        }
+        
     }
     
     @IBAction func pinnedButtonPressed(_ sender: Any) {
@@ -108,19 +114,19 @@ class ContainerVC: UIViewController, CoinHandlerDelegate, ChartViewDelegate{
             coin.setPinned(true)
             pinnedButton.setImage(UIImage(systemName: "star.fill", withConfiguration: symbolConfig), for: .normal)
         }
-        coinHandler.sortCoins()
+        coinHandler.sortCoins(sender: "pinned")
     }
 }
 
 //MARK: Line Chart
 extension ContainerVC: CanUpdateLineChartData{
     @IBAction func lineChartTimeFrameChanged(_ sender: UISegmentedControl) {
-       
         lineChart.noDataText = "Loading Data"
-        
-        
         selectedTimeFrameIndex = sender.selectedSegmentIndex
-        h24ChangeLabel.text = lineChartDataSets[selectedTimeFrameIndex].change
+        if (lineChartDataSets[selectedTimeFrameIndex].data == nil){
+            coinHandler.fetchChartData(id: coin.getID(), timeFrame: lineChartDataSets[selectedTimeFrameIndex].timeFrame)
+        }
+        updateLabels()
         lineChart.data = lineChartDataSets[selectedTimeFrameIndex].data
         self.lineChart.animate(xAxisDuration: 0.7)
         self.lineChart.resetViewPortOffsets()
@@ -130,8 +136,6 @@ extension ContainerVC: CanUpdateLineChartData{
     func chartValueSelected(_ chartView: ChartViewBase, entry: ChartDataEntry, highlight: Highlight) {
         let formattedPrice = K.convertToCoinPrice(entry.y, currency: coinHandler.preferredCurrency)
         priceLabel.text = formattedPrice
-        
-        
         
         let format = DateFormatter()
         var dateFormat: String = "yyyy-MM-dd HH:mm:ss"
@@ -143,15 +147,18 @@ extension ContainerVC: CanUpdateLineChartData{
         }
         format.dateFormat = dateFormat
         
-//        generator.impactOccurred()
+        
+        
+        let date = NSDate(timeIntervalSince1970: Double(String(format: "%f", entry.x).prefix(10))!)
+
+        h24ChangeLabel.text = format.string(from: date as Date)
+        h24ChangeLabel.textColor = UIColor.label
     }
     
     
     
     func didUpdateLineChartDataSet(dataSet: LineChartDataSet, timeFrame: String) {
         DispatchQueue.main.async {
-//            let col:CGColor
-            
             var col = self.coin.getColor()
             if self.traitCollection.userInterfaceStyle == .dark {
                 col = col.lighter() ?? UIColor.gray
@@ -175,35 +182,25 @@ extension ContainerVC: CanUpdateLineChartData{
             
             
             let data = LineChartData(dataSet: dataSet)
-            print("\(timeFrame) \(dataSet[dataSet.count - 1].y)")
-            print("\(timeFrame) \(dataSet[0].y)")
             var change = (dataSet[dataSet.count - 1].y / dataSet[0].y) * 100
-            
-            var changeString = ""
-            
+                        
             if (change < 0){
                 change = 100 - change
             }else{
                 change = change - 100
             }
             
-            if (change > 0){
-                changeString = "+\(String(format: "%.2f", change))%"
-            }else{
-                
-                changeString = "\(String(format: "%.2f", change))%"
-            }
-            
-            
-            
-            
+            let high = dataSet.yMax
+            let low = dataSet.yMin
+
             for i in 0..<self.lineChartDataSets.count{
                 if self.lineChartDataSets[i].timeFrame == timeFrame{
                     self.lineChartDataSets[i].data = data
-                    self.lineChartDataSets[i].change = changeString
-                  
+                    self.lineChartDataSets[i].change = change
+                    self.lineChartDataSets[i].high = high
+                    self.lineChartDataSets[i].low = low
                     if i == self.selectedTimeFrameIndex{
-                        self.h24ChangeLabel.text = self.lineChartDataSets[self.selectedTimeFrameIndex].change
+                        self.updateLabels()
                         self.lineChart.data = self.lineChartDataSets[self.selectedTimeFrameIndex].data
                         self.lineChart.animate(xAxisDuration: 0.7)
                     }
@@ -227,14 +224,28 @@ extension ContainerVC: CanUpdateLineChartData{
     
     
     func panGestureEnded(_ chartView: ChartViewBase) {
-        priceLabel.text = K.convertToCoinPrice(coin.getPrice(), currency: coinHandler.preferredCurrency)
-        h24ChangeLabel.text = lineChartDataSets[selectedTimeFrameIndex].change
+        updateLabels()
         lineChart.highlightValue(nil)
     }
     
+    func updateLabels(){
+        var changeString = ""
+        if (self.lineChartDataSets[self.selectedTimeFrameIndex].change > 0){
+            h24ChangeLabel.textColor = UIColor.systemGreen
+            changeString = "+\(String(format: "%.2f", self.lineChartDataSets[self.selectedTimeFrameIndex].change))%"
+        }else{
+            h24ChangeLabel.textColor = UIColor.systemRed
+            changeString = "\(String(format: "%.2f", self.lineChartDataSets[self.selectedTimeFrameIndex].change))%"
+        }
+        priceLabel.text = K.convertToCoinPrice(coin.getPrice(), currency: coinHandler.preferredCurrency)
+        self.h24ChangeLabel.text = "Change: \(changeString)"
+        self.highLabel.text = "High: \(K.convertToCoinPrice(self.lineChartDataSets[self.selectedTimeFrameIndex].high, currency: self.coinHandler.preferredCurrency))"
+        self.lowLabel.text = "Low: \(K.convertToCoinPrice(self.lineChartDataSets[self.selectedTimeFrameIndex].low, currency: self.coinHandler.preferredCurrency))"
+        
+    }
+    
     func didFetchCoinPrice(price: Double) {}
-    
-    
+
     
  
 }

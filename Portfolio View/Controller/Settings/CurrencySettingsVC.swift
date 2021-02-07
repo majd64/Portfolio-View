@@ -16,26 +16,11 @@ class CurrencySettingsVC: UITableViewController, UISearchBarDelegate{
     var isSecondaryCurrency = false
     
     override func viewDidLoad() {
-        print (isSecondaryCurrency)
         searchBar.delegate = self
         currencies = coinHandler.getCurrencies()
         super.viewDidLoad()
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        if coinHandler.appearance == "dark"{
-            overrideUserInterfaceStyle = .dark
-            self.navigationController?.overrideUserInterfaceStyle = .dark
-        }
-        else if coinHandler.appearance == "light"{
-            overrideUserInterfaceStyle = .light
-            self.navigationController?.overrideUserInterfaceStyle = .light
-        }else{
-            overrideUserInterfaceStyle = .unspecified
-            self.navigationController?.overrideUserInterfaceStyle = .unspecified
-        }
-    }
-    
+
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return currencies.count
     }
@@ -43,10 +28,7 @@ class CurrencySettingsVC: UITableViewController, UISearchBarDelegate{
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell()
         cell.textLabel!.text = currencies[indexPath.row].uppercased()
-        if !isSecondaryCurrency && coinHandler.preferredCurrency == currencies[indexPath.row]{
-            cell.accessoryType = .checkmark
-        }
-        else if isSecondaryCurrency && coinHandler.secondaryCurrency == currencies[indexPath.row]{
+        if (!isSecondaryCurrency && coinHandler.preferredCurrency == currencies[indexPath.row]) || (isSecondaryCurrency && coinHandler.secondaryCurrency == currencies[indexPath.row]){
             cell.accessoryType = .checkmark
         }
         return cell

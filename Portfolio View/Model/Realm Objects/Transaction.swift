@@ -114,6 +114,10 @@ class Transaction: Object{
         return date
     }
     
+    func setDate(_ value: Double){
+        self.date = value
+    }
+    
     func getAmountOfParentCoin() -> String{
         let numberFormatter = NumberFormatter()
         numberFormatter.numberStyle = .decimal

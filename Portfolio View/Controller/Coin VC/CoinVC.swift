@@ -30,21 +30,6 @@ class CoinVC: UIViewController{
             self.transactionsTableView.reloadData()
         }
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        if coinHandler.appearance == "dark"{
-            overrideUserInterfaceStyle = .dark
-            self.navigationController?.overrideUserInterfaceStyle = .dark
-        }
-        else if coinHandler.appearance == "light"{
-            overrideUserInterfaceStyle = .light
-            self.navigationController?.overrideUserInterfaceStyle = .light
-        }else{
-            overrideUserInterfaceStyle = .unspecified
-            self.navigationController?.overrideUserInterfaceStyle = .unspecified
-        }
-    }
-    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "goToContainerVC"{
             let destinationVC = segue.destination as! ContainerVC
@@ -97,7 +82,7 @@ extension CoinVC: UITableViewDelegate, UITableViewDataSource{
             let cell = tableView.dequeueReusableCell(withIdentifier: "coinBalanceCell") as! CoinBalanceCell
             cell.balanceLabel.text = coin.getBalance()
             
-            cell.valueLabel.text = K.convertToMoneyFormat(coin.getBalanceValue(), currency: coinHandler.preferredCurrency)
+            cell.valueLabel.text = K.convertToMoney(coin.getBalanceValue(), currency: coinHandler.preferredCurrency)
       
             return cell
             

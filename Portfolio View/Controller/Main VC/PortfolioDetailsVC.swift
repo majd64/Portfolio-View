@@ -18,6 +18,7 @@ class PortfolioDetailsVC: UIViewController, UITableViewDelegate, UITableViewData
     @IBOutlet weak var portfolioSecondaryPriceChangeLabel: UILabel!
     
     override func viewDidLoad() {
+        
         tableView.delegate = self
         tableView.dataSource = self
         portfolioPriceChanges = coinHandler.getPortfolioPriceChange()
@@ -55,13 +56,13 @@ class PortfolioDetailsVC: UIViewController, UITableViewDelegate, UITableViewData
         if portfolioPriceChanges[segmentedControl.selectedSegmentIndex] >= 0{
             portfolioPriceChangeLabel.textColor = UIColor.systemGreen
             portfolioSecondaryPriceChangeLabel.textColor = UIColor.systemGreen
-            portfolioPriceChangeLabel.text = "+\(K.convertToMoneyFormat(portfolioPriceChanges[0], currency: coinHandler.preferredCurrency))"
-            portfolioSecondaryPriceChangeLabel.text = "+\(K.convertToMoneyFormat(coinHandler.convertCurrencies(from: coinHandler.preferredCurrency, to: coinHandler.secondaryCurrency, amount: portfolioPriceChanges[0]) ?? 0, currency: coinHandler.secondaryCurrency)) \(coinHandler.secondaryCurrency.uppercased())"
+            portfolioPriceChangeLabel.text = "+\(K.convertToMoney(portfolioPriceChanges[segmentedControl.selectedSegmentIndex], currency: coinHandler.preferredCurrency))"
+            portfolioSecondaryPriceChangeLabel.text = "+\(K.convertToMoney(coinHandler.convertCurrencies(from: coinHandler.preferredCurrency, to: coinHandler.secondaryCurrency, amount: portfolioPriceChanges[segmentedControl.selectedSegmentIndex]) ?? 0, currency: coinHandler.secondaryCurrency)) \(coinHandler.secondaryCurrency.uppercased())"
         }else{
             portfolioPriceChangeLabel.textColor = UIColor.systemRed
             portfolioSecondaryPriceChangeLabel.textColor = UIColor.systemRed
-            portfolioPriceChangeLabel.text = "-\(K.convertToMoneyFormat(portfolioPriceChanges[0], currency: coinHandler.preferredCurrency))"
-            portfolioSecondaryPriceChangeLabel.text = "-\(K.convertToMoneyFormat(coinHandler.convertCurrencies(from: coinHandler.preferredCurrency, to: coinHandler.secondaryCurrency, amount: portfolioPriceChanges[0]) ?? 0, currency: coinHandler.secondaryCurrency)) \(coinHandler.secondaryCurrency.uppercased())"
+            portfolioPriceChangeLabel.text = "-\(K.convertToMoney(portfolioPriceChanges[segmentedControl.selectedSegmentIndex] * -1, currency: coinHandler.preferredCurrency))"
+            portfolioSecondaryPriceChangeLabel.text = "-\(K.convertToMoney(coinHandler.convertCurrencies(from: coinHandler.preferredCurrency, to: coinHandler.secondaryCurrency, amount: portfolioPriceChanges[segmentedControl.selectedSegmentIndex] * -1) ?? 0, currency: coinHandler.secondaryCurrency)) \(coinHandler.secondaryCurrency.uppercased())"
         }
     }
     

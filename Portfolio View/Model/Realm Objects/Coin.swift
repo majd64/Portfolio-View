@@ -58,6 +58,23 @@ class Coin: Object{
         }
     }
     
+    func update(price: Double, marketCapRank: Int, change24h: Double, change1h: Double, change1w: Double, change1m: Double, change1y: Double){
+        do{
+            try realm!.write(){
+                self.price = price
+                self.marketCapRank = marketCapRank
+                self.changePercentage24h = change24h
+                self.changePercentage1h = change1h
+                self.changePercentage1w = change1w
+                self.changePercentage1m = change1m
+                self.changePercentage1y = change1y
+            }
+        }catch{
+            print("error saving: \(error)")
+        }
+        
+    }
+    
     func getCoinVersion() -> Int{
         return coinVersion
     }
@@ -227,7 +244,7 @@ class Coin: Object{
         return String(numberFormatter.string(from: NSNumber(value: balance)) ?? "0")
     }
     
-    func getBalanceValue() -> Double{
+    func getBalanceValue() -> Double{//error lies here
         return price * balance
     }
     

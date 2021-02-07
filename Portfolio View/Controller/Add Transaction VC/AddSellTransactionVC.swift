@@ -16,6 +16,11 @@ class AddSellTransactionVC: UITableViewController, UITextFieldDelegate{
     var isMissingRequiredField = false
     var isNegativeBalance = false
     
+    var isEditingTransaction = false
+    var transaction: Transaction?
+    
+    @IBOutlet weak var addOrSaveLabel: UILabel!
+    @IBOutlet weak var segmentedControl: UISegmentedControl!
     @IBOutlet weak var pairCell: UITableViewCell!
     @IBOutlet weak var pairLabel: UILabel!
     @IBOutlet weak var amountReceivedCell: UITableViewCell!
@@ -35,7 +40,24 @@ class AddSellTransactionVC: UITableViewController, UITextFieldDelegate{
         amountRecievedTextField.delegate = self
         notesTextField.delegate = self
         selectedFiat = coinHandler.preferredCurrency
-        
+        addOrSaveLabel.text = "Add"
+        if (isEditingTransaction){
+            addOrSaveLabel.text = "Save"
+            segmentedControl.isEnabled = false
+            if (transaction?.getTransactionType() == Transaction.typeSold){
+                transactionType = Transaction.typeSold
+                segmentedControl.selectedSegmentIndex = 0
+                selectedFiat = transaction!.getPairId()
+                amountSoldTextField.text = String(transaction!.getAmountOfParentCoin() as Double)
+                amountRecievedTextField.text = String(transaction!.getAmountOfPair() as Double)
+            }else{
+                transactionType = Transaction.typeSent
+                amountSoldTextField.text = String(transaction!.getAmountOfParentCoin() as Double)
+                segmentedControl.selectedSegmentIndex = 1
+            }
+            notesTextField.text = transaction!.getNotes()
+        }
+        reloadTableView()
         super.viewDidLoad()
     }
     
@@ -74,7 +96,7 @@ class AddSellTransactionVC: UITableViewController, UITextFieldDelegate{
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         if indexPath.section == 4{
-            if let amountSold = Double(amountSoldTextField.text ?? ""){
+            if let amountSold = Double(K.convertCommasToDots(amountSoldTextField.text ?? "")){
                 if coin.getBalance() - amountSold < 0{
                     isMissingRequiredField = false
                     isNegativeBalance = true
@@ -82,24 +104,45 @@ class AddSellTransactionVC: UITableViewController, UITextFieldDelegate{
                     return
                 }
                 if transactionType == Transaction.typeSold{
-                    if let amountRecieved = Double(amountRecievedTextField.text ?? ""){
-                        let transaction = Transaction(amountOfParentCoinSold: amountSold, soldFor: selectedFiat, amountOfPairReceived: amountRecieved)
+                    if let amountRecieved = Double(K.convertCommasToDots(amountRecievedTextField.text ?? "")){
+                        let newTransaction = Transaction(amountOfParentCoinSold: amountSold, soldFor: selectedFiat, amountOfPairReceived: amountRecieved)
                         if let notes = notesTextField.text{
-                            transaction.setNotes(notes: notes)
+                            newTransaction.setNotes(notes: notes)
                         }
-                        coin.addTransaction(transaction)
-                        coinHandler.refresh()
+                        if (isEditingTransaction){
+                            if let navController = self.navigationController, navController.viewControllers.count >= 2 {
+                                 let viewController = navController.viewControllers[navController.viewControllers.count - 2] as! TransactionDetailVC
+                                viewController.transaction = newTransaction
+                            }
+                            
+                            let date: Double = self.transaction!.getDate()
+                            newTransaction.setDate(date)
+                            coin.deleteTransaction(self.transaction!)
+                        }
+                        
+                        coin.addTransaction(newTransaction)
+                        coinHandler.refresh(sender: "add transaction")
                         _ = navigationController?.popViewController(animated: true)
                         return
                     }
                 }
                 else if transactionType == Transaction.typeSent{
-                    let transaction = Transaction(amountSent: amountSold)
+                    let newTransaction = Transaction(amountSent: amountSold)
                     if let notes = notesTextField.text{
-                        transaction.setNotes(notes: notes)
+                        newTransaction.setNotes(notes: notes)
                     }
-                    coin.addTransaction(transaction)
-                    coinHandler.refresh()
+                    if (isEditingTransaction){
+                        if let navController = self.navigationController, navController.viewControllers.count >= 2 {
+                             let viewController = navController.viewControllers[navController.viewControllers.count - 2] as! TransactionDetailVC
+                            viewController.transaction = newTransaction
+                        }
+                        
+                        let date: Double = self.transaction!.getDate()
+                        newTransaction.setDate(date)
+                        coin.deleteTransaction(self.transaction!)
+                    }
+                    coin.addTransaction(newTransaction)
+                    coinHandler.refresh(sender: "add transaction")
                     _ = navigationController?.popViewController(animated: true)
                     return
                 }

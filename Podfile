@@ -9,5 +9,5 @@ target 'Portfolio View' do
 	 pod "RealmSwift"
    pod "Charts"
    pod "StaticDataTableViewController"
-
 end
+

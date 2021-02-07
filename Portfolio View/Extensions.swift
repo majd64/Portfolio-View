@@ -6,12 +6,55 @@
 //  Copyright © 2020 Majd Hailat. All rights reserved.
 //
 
+
+//        if (isEditingTransaction){
+//            segmentedControl.isEnabled = false
+//            if transaction?.getTransactionType() == Transaction.typeBought || transaction?.getTransactionType() == Transaction.typeReceived{
+//                segmentedControl.selectedSegmentIndex = 0
+//                addBuyTransactionView.alpha = 1
+//                addSellTransactionView.alpha = 0
+//            }else{
+//                segmentedControl.selectedSegmentIndex = 1
+//                addBuyTransactionView.alpha = 0
+//                addSellTransactionView.alpha = 1
+//            }
+//        }
+
 import UIKit
 
+extension UIColor
+{
+    func isLight() -> Bool
+    {
+        // algorithm from: http://www.w3.org/WAI/ER/WD-AERT/#color-contrast
+        let components = self.cgColor.components
+        var brightness = ((components![0] * 299) + (components![1] * 587) + (components![2] * 114))
+        brightness /= 1000
+
+        if brightness < 0.5
+        {
+            return false
+        }
+        else
+        {
+            return true
+        }
+    }
+}
+
+extension UIColor {
+    var rgba: (red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat) {
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var alpha: CGFloat = 0
+        getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+
+        return (red, green, blue, alpha)
+    }
+}
+
 extension UIImage {
-    /*
-     Returns the avergae color of an image
-     */
     var averageColor: UIColor? {
         guard let inputImage = CIImage(image: self) else { return nil }
         let extentVector = CIVector(x: inputImage.extent.origin.x, y: inputImage.extent.origin.y, z: inputImage.extent.size.width, w: inputImage.extent.size.height)
@@ -26,6 +69,7 @@ extension UIImage {
         return UIColor(red: CGFloat(bitmap[0]) / 255, green: CGFloat(bitmap[1]) / 255, blue: CGFloat(bitmap[2]) / 255, alpha: 1)//CGFloat(bitmap[3]) / 255
     }
 }
+
 
 extension UIColor {
 
@@ -93,13 +137,10 @@ extension CharacterSet {
     }()
 }
 
-
-
 //  UIImageColors.swift
 //  https://github.com/jathu/UIImageColors
 //
 //  Created by Jathu Satkunarajah (@jathu) on 2015-06-11 - Toronto
-
 
 #if os(OSX)
     import AppKit
@@ -145,7 +186,6 @@ fileprivate struct UIImageColorsCounter {
     context of UIImageColors.
 */
 fileprivate extension Double {
-    
     private var r: Double {
         return fmod(floor(self/1000000),1000000)
     }
@@ -443,5 +483,22 @@ extension UIImage {
     }
 }
 
+extension UISegmentedControl {
+    func removeBorders() {
+        setBackgroundImage(imageWithColor(color: backgroundColor ?? .clear), for: .normal, barMetrics: .default)
+        setBackgroundImage(imageWithColor(color: tintColor!), for: .selected, barMetrics: .default)
+        setDividerImage(imageWithColor(color: UIColor.clear), forLeftSegmentState: .normal, rightSegmentState: .normal, barMetrics: .default)
+    }
 
-
+    // create a 1x1 image with this color
+    private func imageWithColor(color: UIColor) -> UIImage {
+        let rect = CGRect(x: 0.0, y: 0.0, width:  1.0, height: 1.0)
+        UIGraphicsBeginImageContext(rect.size)
+        let context = UIGraphicsGetCurrentContext()
+        context!.setFillColor(color.cgColor);
+        context!.fill(rect);
+        let image = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+        return image!
+    }
+}

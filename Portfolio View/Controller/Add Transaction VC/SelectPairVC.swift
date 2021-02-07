@@ -111,9 +111,5 @@ class SelectPairVC: UIViewController, UITableViewDataSource, UITableViewDelegate
             send.selectedFiat = currencies[indexPath.row]
             _ = navigationController?.popViewController(animated: true)
         }
-        else if let send = sender as? AddTransferTransactionVC{
-            send.otherCoin = coins[indexPath.row]
-            _ = navigationController?.popViewController(animated: true)
-        }
     }
 }

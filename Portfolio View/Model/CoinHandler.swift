@@ -11,120 +11,136 @@ import RealmSwift
 import Charts
 
 class CoinHandler{
-    private let defaults = UserDefaults.standard
+    let defaults = UserDefaults.standard
     private let realm = try! Realm(configuration: Realm.Configuration(schemaVersion: 2))
     var delegate: CoinHandlerDelegate?
-    var refreshDelegate: CanRefresh?
+    var secondaryDelegate: CoinHandlerDelegate?
     var lineChartDelegate: CanUpdateLineChartData?
-    private var networkHandler: NetworkHandler = NetworkHandler()
+    var networkHandler: NetworkHandler = NetworkHandler()
     private var coins: Results<Coin>!
-    private var currencies: [String] = []
-    private var exchangeRates: [ExchnageRate] = []
+    private var currencies: [String] = ["btc", "eth", "usd","aed","ars","aud","bdt","bhd","bmd","brl","cad","chf","clp","cny","czk","dkk","eur","gbp","hkd","huf","idr","ils","inr","jpy","krw","kwd","lkr","mmk","mxn","myr","ngn","nok","nzd","php","pkr","pln","rub","sar","sek","sgd","thb","try","twd","uah","vef","vnd","zar","xdr","xag","xau"]
+    private var exchangeRates: [ExchangeRate] = []
+    var availbleCoins: [AvailbleCoin] = []
+    var tempraryCoins: [AvailbleCoin] = []
+    static var globalRefreshDelegate: CoinHandlerDelegate?
     
-    var preferredCurrency: String{
-        get{
-            if let rate = defaults.string(forKey: "preferredCurrency"){
-                return rate
+    var defaultDarkCellColor = "#48466D"
+    var defaultDarkCellColorAlpha = 0.85
+    var defaultLightCellColor = "#DBE2EF"
+    var defaultLightCellColorAlpha = 0.85
+    
+    var isUpdatingCoinIdsArray = false
+    
+    func updateEnabledCoinIdsArray(newArray: [String]){
+        isUpdatingCoinIdsArray = true
+        for i in newArray{
+            if (enabledCoinIdsArray.firstIndex(of: i) == nil){
+                var array = defaults.stringArray(forKey: "enabledCoins")!
+                array.append(i.lowercased())
+                defaults.setValue(array, forKey: "enabledCoins")
             }
-            defaults.set("usd", forKey: "preferredCurrency")
-            return "usd"
-        }set{
-            defaults.set(newValue, forKey: "preferredCurrency")
-            fetchCoinData()
+        }
+        
+        for i in enabledCoinIdsArray{
+            if (newArray.firstIndex(of: i) == nil){
+                if let coin: Coin = getCoin(id: i){
+                    if coin.getBalance() == 0{
+                        var array = defaults.stringArray(forKey: "enabledCoins")!
+                        if let index = array.firstIndex(of: i.lowercased()){
+                            array.remove(at: index)
+                            defaults.setValue(array, forKey: "enabledCoins")
+                        }
+                    }
+                }
+            }
         }
     }
     
-    var secondaryCurrency: String{
-        get{
-            if let rate = defaults.string(forKey: "secondaryCurrency"){
-                return rate
+    func deleteUnenabledCoins(){
+        for coin: Coin in coins{
+            if enabledCoinIdsArray.firstIndex(of: coin.getID()) == nil{
+                do{
+                    try self.realm.write(){
+                        self.realm.delete(coin)
+                    }
+                }catch{
+                    print("error saving context \(error)")
+                }
             }
-            defaults.set("btc", forKey: "secondaryCurrency")
-            return "usd"
-        }set{
-            defaults.set(newValue, forKey: "secondaryCurrency")
-            fetchCoinData()
+        }
+        fetchCoinData(lightRefresh: false)
+    }
+    
+    let sortTypeNames: [String] = ["Balance Value", "Market Cap", "24h Change", "Price", "Name"]
+    let sortTypeIds: [String] = ["balanceValue", "marketCapRank", "changePercentage24h", "price", "name"]
+    
+    static func globalRefresh(){
+        globalRefreshDelegate?.requestRefresh()
+    }
+    
+
+    init() {
+        networkHandler.delegate = self
+        networkHandler.fetchExchangeRates()
+        networkHandler.fetchAvailbleCoins(numOfPages: 12)
+        coins = realm.objects(Coin.self)
+        if defaults.string(forKey: "updateVersion") == "2"{
+            migrateFromVersion2()
+        }
+        defaults.set("4", forKey: "updateVersion")
+    }
+    func migrateFromVersion2(){
+        let numberOfCoinsWithBalance = getPortfolioPercentages().count
+        var enabledCoins = enabledCoinIdsArray
+        enabledCoins = []
+        let totalNumberOfCoins = numberOfCoinsWithBalance < 25 ? 25 : numberOfCoinsWithBalance
+        var counter = 0
+        for coin: Coin in coins.sorted(byKeyPath: "marketCapRank", ascending: true).sorted(byKeyPath: "balanceValue", ascending: false){
+            if counter < totalNumberOfCoins{
+                enabledCoins.append(coin.getID())
+                counter += 1
+            }else{
+                break
+            }
+        }
+        defaults.setValue(enabledCoins, forKey: "enabledCoins")
+        for coin: Coin in coins{
+            if !enabledCoins.contains(coin.getID()){
+                do{
+                    try self.realm.write(){
+                        self.realm.delete(coin)
+                    }
+                }catch{
+                    print("error saving context \(error)")
+                }
+            }
         }
     }
     
-    var deviceToken: String{
-        get{
-            guard let token = defaults.string(forKey: "deviceToken") else{
-                fatalError("no device token")
-            }
-            return token
-        }
-    }
-    
-    var appearance: String{
-        get{
-            if let appearance = defaults.string(forKey: "appearance"){
-                return appearance
-            }
-            defaults.set("auto", forKey: "appearance")
-            return "auto"
-        }set{
-            defaults.set(newValue, forKey: "appearance")
-        }
-    }
-    
-    var didInit: Bool{
-        if coins.count != 0{
+    func shouldSpin() -> Bool{
+        if coins.count != enabledCoinIdsArray.count{
             return true
         }
         return false
     }
     
-    let sortTypeNames: [String] = ["Balance Value", "Market Cap", "24h Change", "Price", "Name"]
-    let sortTypeIds: [String] = ["balanceValue", "marketCapRank", "changePercentage24h", "price", "name"]
-    var preferredSortType: String{
-        get{
-            if let sortType = defaults.string(forKey: "preferredSortType"){
-                return sortType
-            }
-            defaults.set("balanceValue", forKey: "preferredSortType")
-            return "balanceValue"
-        }set{
-            if sortTypeIds.contains(newValue){
-                defaults.set(newValue, forKey: "preferredSortType")
-                sortCoins()
-            }
-        }
-    }
-    
-    init() {
-        
-        
-        if defaults.string(forKey: "updateVersion") == nil{
-            defaults.set("balanceValue", forKey: "preferredSortType")
-            defaults.set("usd", forKey: "preferredCurrency")
-            
-        }
-        defaults.set("2", forKey: "updateVersion")
-        
-        
-        
-        networkHandler.delegate = self
-        coins = realm.objects(Coin.self)
-        sortCoins()
-        fetchCoinData()
-        networkHandler.fetchCurrencies()
-        networkHandler.fetchExchangeRates()
-    }
-    
-    func sortCoins(){
+    func sortCoins(sender: String){
         var ascending: Bool = false
         coins = coins?.sorted(byKeyPath: "marketCapRank", ascending: true)
-        if preferredSortType == "name" || preferredSortType == "marketCapRank"{
+        if self.preferredSortType == "name" || preferredSortType == "marketCapRank"{
             ascending = true
         }
         coins = coins?.sorted(byKeyPath: preferredSortType, ascending: ascending)
         coins = coins?.sorted(byKeyPath: "isPinned", ascending: false)
-        refreshDelegate?.refresh()
+        refresh(sender: sender)
     }
     
     func getCoins() -> [Coin]{
         return Array(coins)
+    }
+    
+    func getAvailbleCoins() -> [AvailbleCoin]{
+        return availbleCoins
     }
     
     func getCoin(id: String) -> Coin?{
@@ -140,21 +156,24 @@ class CoinHandler{
         return currencies
     }
 
-    func getTotalBalanceValue() -> Double{
+    func getTotalBalanceValue() -> Double{//ERROR HERE
         var totalBalanceValue: Double = 0
+        
         for coin: Coin in coins{
             totalBalanceValue += coin.getBalanceValue()
         }
         return totalBalanceValue
     }
     
-    func refresh(){
-        refreshDelegate?.refresh()
+    func refresh(sender: String){
+        secondaryDelegate?.refresh(sender: sender)
+        delegate?.refresh(sender: sender)
+    
     }
 
     func getPortfolioPercentages() -> [(coinID: String, percentage: Double)]{
         var percentages: [(coinID: String, percentage: Double)] = []
-        
+
         for coin in coins.sorted(byKeyPath: "balanceValue", ascending: false){
             if coin.getBalance() != 0{
                 if getTotalBalanceValue() != 0{
@@ -164,6 +183,38 @@ class CoinHandler{
             }
         }
         return percentages
+    }
+    
+    func generateQueryStringOfEnabledCoinIdsSeperatedByCommas(numberOfCoins: Int?) -> String{
+        
+        if let numOfCoins = numberOfCoins{
+            let maxNumberOfCoins = coins.count < numOfCoins ? coins.count : numOfCoins
+            var query = ""
+            var counter = 0
+            for coin: Coin in coins.sorted(byKeyPath: "marketCapRank", ascending: true).sorted(byKeyPath: "balanceValue", ascending: false){
+                if counter < maxNumberOfCoins - 1{
+                    query += coin.getID() + ","
+                    counter += 1
+                }else{
+                    query += coin.getID()
+                    break
+                }
+            }
+            return query
+        }else{
+            var query = ""
+            let arr = enabledCoinIdsArray
+            for i in 0..<arr.count{
+                if (i < arr.count - 1){
+                    query += arr[i]
+                    query += ","
+                }else{
+                    query += arr[i]
+                }
+            }
+            return query
+        }
+        
     }
     
     //MARK: - Pie Chart
@@ -184,13 +235,13 @@ class CoinHandler{
     }
     
     func convertCurrencies(from: String, to: String, amount: Double) -> Double?{
-        for i: ExchnageRate in exchangeRates{
+        for i: ExchangeRate in exchangeRates{
             if i.symbol.uppercased() == from.uppercased(){
-                for l: ExchnageRate in exchangeRates{
+                for l: ExchangeRate in exchangeRates{
                     if l.symbol.uppercased() == to.uppercased(){
                         let fromPrice = Double(i.rateUsd) ?? 1
                         let toPrice = Double(l.rateUsd) ?? 1
-                  
+
                         return fromPrice/toPrice*amount
                     }
                 }
@@ -198,24 +249,76 @@ class CoinHandler{
         }
         return nil
     }
+    
+    func getPortfolioPriceChange() -> [Double]{
+        var changes: [Double] = [0, 0, 0, 0, 0]
+        for i in 0...4{
+            var seconds: Double = 0
+            var change: Double = 0
+
+            var totalChange: Double = 0
+            for coin: Coin in coins{
+                switch i{
+                case 0:
+                    seconds = 3600
+                    change = coin.getChangePercentage1h()
+                case 1:
+                    seconds = 86400
+                    change = coin.getChangePercentage24h()
+                case 2:
+                    seconds = 604800
+                    change = coin.getChangePercentage1w()
+                case 3:
+                    seconds = 2592000
+                    change = coin.getChangePercentage1m()
+
+                case 4:
+                    seconds = 31536000
+                    change = coin.getChangePercentage1y()
+                default:
+                    seconds = 3600
+                    change = coin.getChangePercentage1h()
+                }
+
+                for transaction: Transaction in coin.getTransactions(){
+                    let type = transaction.getTransactionType()
+                    if type == Transaction.typeBought || type == Transaction.typeReceived{
+                        if (NSDate().timeIntervalSince1970 - transaction.getDate()) < seconds{//transaction added today
+                            totalChange += (transaction.getAmountOfParentCoin() * coin.getPrice())
+                        }else{
+                            let startPrice = coin.getPrice() / ((change/100) + 1)
+                            let coinPriceChange = coin.getPrice() - startPrice
+                            let transactionPriceChange = coinPriceChange * transaction.getAmountOfParentCoin()
+                            totalChange += transactionPriceChange
+                        }
+                    }else{
+                        if (NSDate().timeIntervalSince1970 - transaction.getDate()) < seconds{//transaction added today
+                            totalChange -= (transaction.getAmountOfParentCoin() * coin.getPrice()) 
+                        }
+                    }
+                }
+            }
+            changes[i] = totalChange
+
+        }
+        return changes
+    }
 }
 
 
 //MARK: - Network Handler
 extension CoinHandler: NetworkHandlerDelegate{
-    func fetchCoinData(){
-        networkHandler.fetchCoinData(currency: preferredCurrency)
+    func fetchCoinData(lightRefresh: Bool){//light refresh does absolutley nothing now
+        let query = generateQueryStringOfEnabledCoinIdsSeperatedByCommas(numberOfCoins: nil)
+        if (query != ""){
+            let numOfPages: Int = Int((Double(enabledCoinIdsArray.count) / Double(40)).rounded(.up))
+            networkHandler.fetchCoinData(currency: preferredCurrency, enabledCoinIds: query, numOfPages: lightRefresh ? 1 : numOfPages)
+        }else{
+            refresh(sender: "fetch coin data w/ no coins");
+        }
     }
     
-    func didFetchCurrencies(_ networkHandler: NetworkHandler, currencies: [String]) {
-        self.currencies = currencies
-    }
-    
-    func didFetchExchangeRates(_ networkHandler: NetworkHandler, rates: [ExchnageRate]){
-        exchangeRates = rates
-    }
-    
-    
+        
     func fetchChartData(id: String, timeFrame: String){
         var days = ""
         switch timeFrame{
@@ -241,87 +344,56 @@ extension CoinHandler: NetworkHandlerDelegate{
         networkHandler.fetchChartData(id: id, currency: preferredCurrency, days: days, timeFrame: timeFrame)
     }
     
-    func didUpdateCoinsData(_ networkHandler: NetworkHandler, coinsData: [CoinModel]) {
+    
+    func didFetchAvailbleCoins(_ networkHandler: NetworkHandler, availbleCoins: [AvailbleCoin], page: Int?) {
+        
+        if let pageNum = page{
+            if (pageNum == 1){
+                self.availbleCoins = availbleCoins
+                self.availbleCoins.append(contentsOf: tempraryCoins)
+                tempraryCoins = []
+            }else{
+                if (self.availbleCoins.count == 0){
+                    tempraryCoins.append(contentsOf: availbleCoins)
+                    
+                }else{
+                    self.availbleCoins.append(contentsOf: availbleCoins)
+                }
+                
+            }
+        }
+        
+    }
+    
+    func didFetchExchangeRates(_ networkHandler: NetworkHandler, rates: [ExchangeRate]){
+        exchangeRates = rates
+        refresh(sender: "did fetch exchnage rates")
+    }
+    
+    func DidFetchCoinData(_ networkHandler: NetworkHandler, coinsData: [CoinModel]) {
         DispatchQueue.main.async {
-            var didMigrate = false
             for coinData: CoinModel in coinsData{
                 var coin: Coin? = self.getCoin(id: coinData.id)
-                if self.defaults.string(forKey: "didMigrateFromVersion1") == nil{
-                    didMigrate = true
-                    let newCoin = Coin(id: coinData.id, symbol: coinData.symbol ?? "", name: coinData.name ?? "", image: coinData.image ?? "")
+                if coin == nil {
+                    coin = Coin(id: coinData.id, symbol: coinData.symbol ?? "", name: coinData.name ?? "", image: coinData.image ?? "")
                     do{
                         try self.realm.write(){
-                            self.realm.add(newCoin)
+                            self.realm.add(coin!)
                         }
                     }catch{
                         print("error saving context \(error)")
                     }
-                    newCoin.setCoinVersion(2)
-                    newCoin.setPrice(coinData.current_price ?? 0)
-                    newCoin.setMarketCapRank(coinData.market_cap_rank ?? 0)
-                    newCoin.setChangePercent24h(coinData.price_change_percentage_24h ?? 0)
-                    
-                    newCoin.setChangePercent1h(coinData.price_change_percentage_1h_in_currency ?? 0)
-                    newCoin.setChangePercent1w(coinData.price_change_percentage_7d_in_currency ?? 0)
-                    newCoin.setChangePercent1m(coinData.price_change_percentage_30d_in_currency ?? 0)
-                    newCoin.setChangePercent1y(coinData.price_change_percentage_1y_in_currency ?? 0)
-                        
-                    if let transactions = coin?.getTransactions(){
-                        for transaction in transactions{
-                            newCoin.addTransaction(transaction)
-                        }
-                    }
-                    
-                    if coin != nil{
-                        do{
-                            try self.realm.write(){
-                                self.realm.delete(coin!)
-                            }
-                        }catch{
-                            print("error saving context \(error)")
-                        }
-                    }
-                }else{
-                    if coin == nil {
-                        coin = Coin(id: coinData.id, symbol: coinData.symbol ?? "", name: coinData.name ?? "", image: coinData.image ?? "")
-                        do{
-                            try self.realm.write(){
-                                self.realm.add(coin!)
-                            }
-                        }catch{
-                            print("error saving context \(error)")
-                        }
-                    }
-                coin!.setPrice(coinData.current_price ?? 0)
-                coin!.setMarketCapRank(coinData.market_cap_rank ?? 0)
-                coin!.setChangePercent24h(coinData.price_change_percentage_24h ?? 0)
-                    
-                coin!.setChangePercent1h(coinData.price_change_percentage_1h_in_currency ?? 0)
-                coin!.setChangePercent1w(coinData.price_change_percentage_7d_in_currency ?? 0)
-                coin!.setChangePercent1m(coinData.price_change_percentage_30d_in_currency ?? 0)
-                coin!.setChangePercent1y(coinData.price_change_percentage_1y_in_currency ?? 0)
                 }
+                let marketCap = coinData.market_cap_rank ?? 10000
+                                
+                coin!.update(price: coinData.current_price ?? 0, marketCapRank: (marketCap == 0) ? 10000 : marketCap, change24h: coinData.price_change_percentage_24h ?? 0, change1h: coinData.price_change_percentage_1h_in_currency ?? 0, change1w: coinData.price_change_percentage_7d_in_currency ?? 0, change1m: coinData.price_change_percentage_30d_in_currency ?? 0, change1y: coinData.price_change_percentage_1y_in_currency ?? 0)
             }
-            self.sortCoins()
-            self.delegate?.didUpdateCoinsData()
-            if didMigrate{
-                for c: Coin in self.getCoins(){
-                    if c.getCoinVersion() != 2{
-                        do{
-                            try self.realm.write(){
-                                self.realm.delete(c)
-                            }
-                        }catch{
-                            print("error saving context \(error)")
-                        }
-                    }
-                }
-                self.defaults.setValue(true, forKey: "didMigrateFromVersion1")
-            }
+            self.defaults.setValue(true, forKey: "didInit")
+            self.sortCoins(sender: "did fetch")
         }
     }
     
-    func didUpdateChartData(_ networkHandler: NetworkHandler, candlesData: ChartModel, timeFrame: String){
+    func didFetchChartData(_ networkHandler: NetworkHandler, candlesData: ChartModel, timeFrame: String){
         DispatchQueue.main.async {
             var lineChartEntry = [ChartDataEntry]()
             for i in candlesData.prices{
@@ -334,78 +406,16 @@ extension CoinHandler: NetworkHandlerDelegate{
     }
     
     func didFailWithError(error: Error) {
+        secondaryDelegate?.didFailWithError(error: error)
         delegate?.didFailWithError(error: error)
     }
-    
-    
-    
-    
-    func getPortfolioPriceChange() -> [Double]{
-        var changes: [Double] = [0, 0, 0, 0, 0]
-        for i in 0...4{
-            var seconds: Double = 0
-            var change: Double = 0
-            
-            var totalChange: Double = 0
-            for coin: Coin in coins{
-                switch i{
-                case 0:
-                    seconds = 3600
-                    change = coin.getChangePercentage1h()
-                case 1:
-                    seconds = 86400
-                    change = coin.getChangePercentage24h()
-                case 2:
-                    seconds = 604800
-                    change = coin.getChangePercentage1w()
-                case 3:
-                    seconds = 2592000
-                    change = coin.getChangePercentage1m()
-                case 4:
-                    seconds = 31536000
-                    change = coin.getChangePercentage1y()
-                default:
-                    seconds = 3600
-                    change = coin.getChangePercentage1h()
-                }
-                
-                for transaction: Transaction in coin.getTransactions(){
-                    let type = transaction.getTransactionType()
-                    if type == Transaction.typeBought || type == Transaction.typeReceived || type == Transaction.typeTransferredTo{
-                        if (NSDate().timeIntervalSince1970 - transaction.getDate()) < seconds{//transaction added today
-                            totalChange += (transaction.getAmountOfParentCoin() * coin.getPrice())
-                        }else{
-                            let startPrice = coin.getPrice() / ((change/100) + 1)
-                            let coinPriceChange = coin.getPrice() - startPrice
-                            let transactionPriceChange = coinPriceChange * transaction.getAmountOfParentCoin()
-                            totalChange += transactionPriceChange
-                        }
-                    }else{
-                        if (NSDate().timeIntervalSince1970 - transaction.getDate()) < seconds{//transaction added today
-                            totalChange -= (transaction.getAmountOfParentCoin() * coin.getPrice())
-                        }
-                    }
-                }
-            }
-            changes[i] = totalChange
-            
-        }
-        return changes
-        
-    }
-    
- 
-    
 }
 
 protocol CoinHandlerDelegate {
-    func didUpdateCoinsData()
+    func requestRefresh()
+    func refresh(sender: String)
     func didFetchCoinPrice(price: Double)
     func didFailWithError(error: Error)
-}
-
-protocol CanRefresh {
-    func refresh()
 }
 
 protocol CanUpdateLineChartData{

@@ -19,47 +19,31 @@ class TransactionDetailVC: UIViewController, UITableViewDelegate, UITableViewDat
     override func viewDidLoad() {
         transactionDetailsTableView.register(UINib(nibName: "NowCell", bundle: nil), forCellReuseIdentifier: "nowCell")
         transactionDetailsTableView.register(UINib(nibName: "NotesCell", bundle: nil), forCellReuseIdentifier: "notesCell")
-        transactionDetailsTableView.register(UINib(nibName: "DeleteCell", bundle: nil), forCellReuseIdentifier: "deleteCell")
+        transactionDetailsTableView.register(UINib(nibName: "ButtonCell", bundle: nil), forCellReuseIdentifier: "buttonCell")
         hasNote = transaction.getNotes() != ""
         transactionDetailsTableView.delegate = self
         transactionDetailsTableView.dataSource = self
         super.viewDidLoad()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        if coinHandler.appearance == "dark"{
-            overrideUserInterfaceStyle = .dark
-            self.navigationController?.overrideUserInterfaceStyle = .dark
-        }
-        else if coinHandler.appearance == "light"{
-            overrideUserInterfaceStyle = .light
-            self.navigationController?.overrideUserInterfaceStyle = .light
-        }else{
-            overrideUserInterfaceStyle = .unspecified
-            self.navigationController?.overrideUserInterfaceStyle = .unspecified
-        }
+    override func viewDidAppear(_ animated: Bool) {
+        hasNote = transaction.getNotes() != ""
+        transactionDetailsTableView.reloadData()
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if transaction.getTransactionType() == Transaction.typeSold || transaction.getTransactionType() == Transaction.typeBought{
             if hasNote{
-                numberOfCells = 6
+                numberOfCells = 7
             }else{
-                numberOfCells = 5
+                numberOfCells = 6
             }
         }
         else if transaction.getTransactionType() == Transaction.typeSent || transaction.getTransactionType() == Transaction.typeReceived{
             if hasNote{
-                numberOfCells = 4
+                numberOfCells = 5
             }else{
-                numberOfCells = 3
-            }
-        }
-        else if transaction.getTransactionType() == Transaction.typeTransferredTo || transaction.getTransactionType() == Transaction.typeTransferredFrom{
-            if (hasNote){
                 numberOfCells = 4
-            }else{
-                numberOfCells = 2
             }
         }
         return numberOfCells
@@ -72,7 +56,7 @@ class TransactionDetailVC: UIViewController, UITableViewDelegate, UITableViewDat
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let price: Double = coin.getPrice() * transaction.getAmountOfParentCoin()
                 
-        let formattedPrice = "\(K.convertToMoneyFormat(price, currency: coinHandler.preferredCurrency)) \(coinHandler.preferredCurrency.uppercased())"
+        let formattedPrice = "\(K.convertToMoney(price, currency: coinHandler.preferredCurrency)) \(coinHandler.preferredCurrency.uppercased())"
         
         let amount = "\(transaction.getAmountOfParentCoin() as String) \(coin.getSymbol().uppercased())"
         let amountOfPair = transaction.getAmountOfPair()
@@ -96,7 +80,8 @@ class TransactionDetailVC: UIViewController, UITableViewDelegate, UITableViewDat
                 cell.firstLabel.text = formattedPrice
                 if (transaction.getPairId().lowercased() != coinHandler.preferredCurrency.lowercased()){
                     let pairPrice = coinHandler.convertCurrencies(from: coinHandler.preferredCurrency, to: transaction.getPairId(), amount: price)
-                    cell.secondLabel.text = "\(K.convertToMoneyFormat(pairPrice ?? 0, currency: transaction.getPairId())) \(transaction.getPairId().uppercased())"
+                    cell.secondLabel.text = "\(K.convertToMoney(pairPrice ?? 0, currency: transaction.getPairId())) \(transaction.getPairId().uppercased())"
+                    cell.secondLabel.isHidden = false
                 }else{
                     cell.secondLabel.isHidden = true
                 }
@@ -104,35 +89,44 @@ class TransactionDetailVC: UIViewController, UITableViewDelegate, UITableViewDat
             }else if indexPath.row == 2{
                 let cell = tableView.dequeueReusableCell(withIdentifier: "nowCell") as! NowCell
                 cell.titleLabel.text = transaction.getTransactionType() == Transaction.typeBought ? "Spent" : "Recieved"
-                cell.secondLabel.text = "\(K.convertToMoneyFormat(amountOfPair, currency: transaction.getPairId())) \(transaction.getPairId().uppercased())"
+                cell.firstLabel.text = "\(K.convertToMoney(amountOfPair, currency: transaction.getPairId())) \(transaction.getPairId().uppercased())"
                 cell.secondLabel.isHidden = true
                 return cell
             }
             else if indexPath.row == 3{
+                print("PAIRID: \(transaction.getPairId().lowercased())")
+                print("prefcurr: \(coinHandler.preferredCurrency.lowercased())")
                 let cell = tableView.dequeueReusableCell(withIdentifier: "nowCell") as! NowCell
                 cell.titleLabel.text = "Profit & loss"
-                let PNLInPreferredCurrency = coin.getPrice() * transaction.getAmountOfParentCoin() - (coinHandler.convertCurrencies(from: transaction.getPairId(), to: coinHandler.preferredCurrency, amount: amountOfPair) ?? 0)
+                var PNLInPreferredCurrency = coin.getPrice() * transaction.getAmountOfParentCoin() - (coinHandler.convertCurrencies(from: transaction.getPairId(), to: coinHandler.preferredCurrency, amount: amountOfPair) ?? 0)
+                if transaction.getTransactionType() == Transaction.typeSold{
+                    PNLInPreferredCurrency *= -1
+                }
                 var PNLInPreferredCurrencyLabel = ""
                 if PNLInPreferredCurrency < 0{
                     cell.firstLabel.textColor = UIColor.systemRed
                     cell.secondLabel.textColor = UIColor.systemRed
-                    PNLInPreferredCurrencyLabel = "-\(K.convertToMoneyFormat(PNLInPreferredCurrency * -1, currency: coinHandler.preferredCurrency)) \(coinHandler.preferredCurrency.uppercased())"
+                    PNLInPreferredCurrencyLabel = "-\(K.convertToMoney(PNLInPreferredCurrency * -1, currency: coinHandler.preferredCurrency)) \(coinHandler.preferredCurrency.uppercased())"
                 }else{
                     cell.firstLabel.textColor = UIColor.systemGreen
                     cell.secondLabel.textColor = UIColor.systemGreen
-                    PNLInPreferredCurrencyLabel = "+\(K.convertToMoneyFormat(PNLInPreferredCurrency, currency: coinHandler.preferredCurrency)) \(coinHandler.preferredCurrency.uppercased())"
+                    PNLInPreferredCurrencyLabel = "+\(K.convertToMoney(PNLInPreferredCurrency, currency: coinHandler.preferredCurrency)) \(coinHandler.preferredCurrency.uppercased())"
                 }
                 cell.firstLabel.text = PNLInPreferredCurrencyLabel
                 if (transaction.getPairId().lowercased() != coinHandler.preferredCurrency.lowercased()){
                     let pairPrice = coinHandler.convertCurrencies(from: coinHandler.preferredCurrency, to: transaction.getPairId(), amount: price)
-                    let PNLInPair = (pairPrice ?? 0) - amountOfPair
+                    var PNLInPair = (pairPrice ?? 0) - amountOfPair
+                    if transaction.getTransactionType() == Transaction.typeSold{
+                        PNLInPair *= -1
+                    }
                     var PNLInPairLabel = ""
                     if PNLInPair < 0{
-                        PNLInPairLabel = "-\(K.convertToMoneyFormat(PNLInPair * -1, currency: transaction.getPairId())) \(transaction.getPairId().uppercased())"
+                        PNLInPairLabel = "-\(K.convertToMoney(PNLInPair * -1, currency: transaction.getPairId())) \(transaction.getPairId().uppercased())"
                     }else{
-                        PNLInPairLabel = "+\(K.convertToMoneyFormat(PNLInPair, currency: transaction.getPairId())) \(transaction.getPairId().uppercased())"
+                        PNLInPairLabel = "+\(K.convertToMoney(PNLInPair, currency: transaction.getPairId())) \(transaction.getPairId().uppercased())"
                     }
                     cell.secondLabel.text = PNLInPairLabel
+                    cell.secondLabel.isHidden = false
                 }else{
                     cell.secondLabel.isHidden = true
                 }
@@ -142,12 +136,20 @@ class TransactionDetailVC: UIViewController, UITableViewDelegate, UITableViewDat
                 let cell = tableView.dequeueReusableCell(withIdentifier: "notesCell") as! NotesCell
                 cell.notes.text = transaction.getNotes()
                 return cell
+            }
+            else if indexPath.row == 5 && hasNote || indexPath.row == 4 && !hasNote{
+                let cell = tableView.dequeueReusableCell(withIdentifier: "buttonCell") as! ButtonCell
+                cell.label.text = "Edit transaction"
+                cell.label.textColor = UIColor.orange
+                return cell
             }else{
-                let cell = tableView.dequeueReusableCell(withIdentifier: "deleteCell")!
+                let cell = tableView.dequeueReusableCell(withIdentifier: "buttonCell") as! ButtonCell
+                cell.label.text = "Delete transaction"
+                cell.label.textColor = UIColor.red
                 return cell
             }
         }
-        else if transaction.getTransactionType() == Transaction.typeReceived || transaction.getTransactionType() == Transaction.typeSent{
+        else{//SENT/ RECEIVED
             if indexPath.row == 0{
                 let cell = tableView.dequeueReusableCell(withIdentifier: "nowCell") as! NowCell
                 cell.titleLabel.text = transaction.getTransactionType() == Transaction.typeReceived ? "Recieved" : "Sent"
@@ -169,28 +171,29 @@ class TransactionDetailVC: UIViewController, UITableViewDelegate, UITableViewDat
                 let cell = tableView.dequeueReusableCell(withIdentifier: "notesCell") as! NotesCell
                 cell.notes.text = transaction.getNotes()
                 return cell
+            }
+            else if indexPath.row == 3 && hasNote || indexPath.row == 2 && !hasNote{
+                let cell = tableView.dequeueReusableCell(withIdentifier: "buttonCell") as! ButtonCell
+                cell.label.text = "Edit transaction"
+                cell.label.textColor = UIColor.orange
+
+                return cell
             }else{
-                let cell = tableView.dequeueReusableCell(withIdentifier: "deleteCell")!
+                let cell = tableView.dequeueReusableCell(withIdentifier: "buttonCell") as! ButtonCell
+                cell.label.text = "Delete transaction"
+                cell.label.textColor = UIColor.red
                 return cell
             }
         }
-        else {
-            if indexPath.row == 0{
-                let cell = tableView.dequeueReusableCell(withIdentifier: "nowCell") as! NowCell
-                cell.titleLabel.text = "Transfer"
-                cell.firstLabel.text = transaction.getTransactionType() == Transaction.typeTransferredFrom ? "- \(amount)" : "+ \(amount)"
-                if let pairCoin = coinHandler.getCoin(id: transaction.getPairId()){
-                    cell.secondLabel.text = transaction.getTransactionType() == Transaction.typeTransferredFrom ? "+ \(amountOfPair) \(pairCoin.getSymbol().uppercased())" : "- \(amountOfPair) \(pairCoin.getSymbol().uppercased())"
-                }
-                return cell
-            }else if indexPath.row == 1 && hasNote{
-                let cell = tableView.dequeueReusableCell(withIdentifier: "notesCell") as! NotesCell
-                cell.notes.text = transaction.getNotes()
-                return cell
-            }else{
-                let cell = tableView.dequeueReusableCell(withIdentifier: "deleteCell")!
-                return cell
-            }
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if (segue.identifier == "goToEditTransaction"){
+            let dest = segue.destination as! TransactionVC
+            dest.isEditingTransaction = true
+            dest.transaction = self.transaction
+            dest.coinHandler = coinHandler
+            dest.coin = coin
         }
     }
     
@@ -198,8 +201,11 @@ class TransactionDetailVC: UIViewController, UITableViewDelegate, UITableViewDat
         tableView.deselectRow(at: indexPath, animated: true)
         if indexPath.row == numberOfCells - 1{
             coin.deleteTransaction(transaction)
-            coinHandler.refresh()
+            coinHandler.refresh(sender: "transaction deleted")
             _ = navigationController?.popViewController(animated: true)
+        }
+        else if indexPath.row == numberOfCells - 2{
+            performSegue(withIdentifier: "goToEditTransaction", sender: self)
         }
     }
 }
